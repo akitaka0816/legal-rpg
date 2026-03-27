@@ -9,6 +9,16 @@ const STAGES = [
 ];
 const CLEARED_ROLE = "法務責任者";
 
+// ステージごとの基本EXP
+const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
+
+function comboMultiplier(combo) {
+  if (combo >= 4) return 2.5;
+  if (combo >= 3) return 2.0;
+  if (combo >= 2) return 1.5;
+  return 1.0;
+}
+
 const SAVE_KEY = "legal_rpg_save_v3";
 const RANKING_KEY = "legal_rpg_ranking_v1";
 const TIMER_SEC = 30;
@@ -26,6 +36,7 @@ const state = {
   items: { roppo: false, hanrei: false, ai: false },
   gameOver: false,
   cleared: false,
+  combo: 0,
   shuffledIndices: [],
   stageCorrect: 0,
   stageTotal: 0,
@@ -66,11 +77,21 @@ const el = {
   nextBtn:    document.getElementById("nextBtn"),
   restartBtn: document.getElementById("restartBtn"),
   rankingList: document.getElementById("rankingList"),
+  stageClearOverlay: document.getElementById("stageClearOverlay"),
+  stageClearNum:     document.getElementById("stageClearNum"),
+  stageClearRole:    document.getElementById("stageClearRole"),
+  stageClearGrade:   document.getElementById("stageClearGrade"),
+  comboDisplay:      document.getElementById("comboDisplay"),
+  fatalWarning:      document.getElementById("fatalWarning"),
+  scoreBanner:       document.getElementById("scoreBanner"),
+  scoreBannerLabel:  document.getElementById("scoreBannerLabel"),
+  scoreBannerValue:  document.getElementById("scoreBannerValue"),
 };
 
 // ── タイマー ──────────────────────────────────────
 let timerInterval = null;
 let timerRemaining = TIMER_SEC;
+let currentCorrectIdx = 0; // 表示順シャッフル後の正解インデックス
 
 function startTimer() {
   clearTimer();
@@ -107,12 +128,20 @@ function updateTimerDisplay() {
 }
 
 function timeUp() {
-  const damage = state.items.ai ? 10 : 20;
-  state.hp -= damage;
-  state.stageTotal += 1;
   const q = getStageQuestions()[state.shuffledIndices[state.current]];
+  state.stageTotal += 1;
+  state.combo = 0;
+  let msg = "";
+  if (q.fatal) {
+    state.hp = 0;
+    msg = `⏰ 時間切れ！💀 致命的ミス — HP全消滅！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
+  } else {
+    const damage = state.items.ai ? 10 : 20;
+    state.hp -= damage;
+    msg = `⏰ 時間切れ！ HP -${damage}\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
+  }
   state.current += 1;
-  handleAfterAnswer(`⏰ 時間切れ！ HP -${damage}\n解説: ${q.explanation}`, false);
+  handleAfterAnswer(msg, false);
 }
 
 // ── ステージ・問題管理 ─────────────────────────────
@@ -190,17 +219,35 @@ function showQuestion() {
   el.resultSection.classList.add("hidden");
   el.hintText.classList.add("hidden");
   el.hintText.textContent = "";
+
+  // コンボ表示
+  if (state.combo >= 2) {
+    const mult = comboMultiplier(state.combo);
+    el.comboDisplay.textContent = `🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`;
+    el.comboDisplay.classList.remove("hidden");
+  } else {
+    el.comboDisplay.classList.add("hidden");
+  }
+
+  // 即死問題警告
+  el.fatalWarning.classList.toggle("hidden", !q.fatal);
+
   el.questionText.textContent = `Q${state.current + 1} [${q.theme}] ${q.text}`;
   el.choices.innerHTML = "";
 
-  q.choices.forEach((choice, idx) => {
+  // 選択肢の表示順をシャッフル
+  const choiceOrder = shuffle([...Array(q.choices.length).keys()]);
+  currentCorrectIdx = choiceOrder.indexOf(q.answer);
+
+  choiceOrder.forEach((origIdx, displayIdx) => {
+    const choice = q.choices[origIdx];
     const b = document.createElement("button");
     b.className = "choice-btn";
-    b.textContent = `${idx + 1}. ${choice}`;
-    b.addEventListener("click", () => answerQuestion(idx));
-    if (state.items.hanrei && idx !== q.answer && idx % 2 === 1) {
+    b.textContent = `${displayIdx + 1}. ${choice}`;
+    b.addEventListener("click", () => answerQuestion(displayIdx));
+    if (state.items.hanrei && origIdx !== q.answer && displayIdx % 2 === 1) {
       b.disabled = true;
-      b.textContent = `${idx + 1}. ${choice}（判例DBで除外）`;
+      b.textContent = `${displayIdx + 1}. ${choice}（判例DBで除外）`;
     }
     el.choices.appendChild(b);
   });
@@ -214,24 +261,36 @@ function answerQuestion(selected) {
   clearTimer();
   const qs = getStageQuestions();
   const q  = qs[state.shuffledIndices[state.current]];
-  const correct = selected === q.answer;
+  const correct = selected === currentCorrectIdx;
   let msg = "";
 
   state.stageTotal += 1;
 
   if (correct) {
-    state.exp += 10;
+    state.combo += 1;
+    const mult = comboMultiplier(state.combo);
+    const baseExp = EXP_PER_STAGE[state.stageIndex] ?? 10;
+    const gained = Math.floor(baseExp * mult);
+    state.exp += gained;
     state.stageCorrect += 1;
-    msg += "✅ 正解！ EXP +10\n";
-    // EXP レベルアップ（役職は変わらず、スコア・称号のみ）
-    if (state.exp >= state.lv * 30) {
+    msg += `✅ 正解！ EXP +${gained}`;
+    if (state.combo >= 2) msg += ` 🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`;
+    msg += "\n";
+    if (state.exp >= state.lv * 50) {
       state.lv += 1;
       msg += `⬆️ レベルアップ！ LV${state.lv}\n`;
     }
   } else {
-    const damage = state.items.ai ? 10 : 20;
-    state.hp -= damage;
-    msg += `❌ 不正解… HP -${damage}\n`;
+    state.combo = 0;
+    if (q.fatal) {
+      state.hp = 0;
+      msg += `💀 致命的ミス！ HP全消滅！\n`;
+    } else {
+      const damage = state.items.ai ? 10 : 20;
+      state.hp -= damage;
+      msg += `❌ 不正解… HP -${damage}\n`;
+    }
+    msg += `正解: ${q.choices[q.answer]}\n`;
   }
 
   msg += `解説: ${q.explanation}`;
@@ -257,16 +316,20 @@ function handleAfterAnswer(msg, correct) {
     const grade = calcGrade(state.stageCorrect, state.stageTotal, state.hp, state.stageStartHp);
 
     if (state.stageIndex < STAGES.length - 1) {
-      msg += `\n\n--- ステージ ${state.stageIndex + 1} クリア！---`;
-      msg += `\n評価: ${grade.label}（${grade.reason}）`;
+      const clearedNum  = state.stageIndex + 1;
+      const nextRole    = STAGES[state.stageIndex + 1].role;
+      showStageClearOverlay(clearedNum, nextRole, grade.label, false);
+
+      msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
-      msg += `\n次のステージへ: ${STAGES[state.stageIndex + 1].name}`;
-      msg += `\n役職: ${STAGES[state.stageIndex].role} → ${STAGES[state.stageIndex + 1].role}`;
+      msg += `\n次のステージ: ${STAGES[state.stageIndex + 1].name}`;
+      msg += `\n新役職: ${nextRole}`;
       msg += `\nヒント +1 獲得`;
 
       state.stageIndex += 1;
       state.current = 0;
       state.hints += 1;
+      state.combo = 0;
       state.stageCorrect = 0;
       state.stageTotal = 0;
       state.stageStartHp = state.hp;
@@ -280,7 +343,8 @@ function handleAfterAnswer(msg, correct) {
       const score = calcScore();
       state.totalScore = score;
       saveRanking(state.name, score, grade.label);
-      msg += `\n\n🏆 全ステージクリア！法務責任者に就任しました！`;
+      showStageClearOverlay(STAGES.length, CLEARED_ROLE, grade.label, true);
+      msg += `\n\n法務責任者に就任しました！`;
       msg += `\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n最終スコア: ${score}`;
@@ -296,7 +360,29 @@ function handleAfterAnswer(msg, correct) {
   el.quizSection.classList.add("hidden");
   el.resultSection.classList.remove("hidden");
   el.resultText.textContent = msg;
+
+  // スコアバナー表示（ゲーム終了時のみ）
+  if (state.gameOver || state.cleared) {
+    el.scoreBanner.classList.remove("hidden");
+    el.scoreBanner.classList.toggle("gameover", state.gameOver);
+    el.scoreBannerLabel.textContent = state.gameOver ? "GAME OVER  FINAL SCORE" : "FINAL SCORE";
+    el.scoreBannerValue.textContent = `${state.totalScore} pt`;
+  } else {
+    el.scoreBanner.classList.add("hidden");
+  }
+
   saveState();
+}
+
+// ── ステージクリア演出 ─────────────────────────────
+function showStageClearOverlay(stageNum, newRole, grade, isFinal) {
+  const gradeColors = { S: "#fef08a", A: "#bfdbfe", B: "#bbf7d0", C: "#d1d5db" };
+  el.stageClearNum.textContent   = isFinal ? "全ステージクリア！" : `Stage ${stageNum} クリア！`;
+  el.stageClearRole.textContent  = isFinal ? `🏆 ${newRole} に就任！` : `新役職: ${newRole}`;
+  el.stageClearGrade.textContent = `評価 ${grade}`;
+  el.stageClearGrade.style.color = gradeColors[grade] || "#e2e8f0";
+  el.stageClearOverlay.classList.remove("hidden");
+  setTimeout(() => el.stageClearOverlay.classList.add("hidden"), 2800);
 }
 
 // ── 評価・スコア ───────────────────────────────────
@@ -370,7 +456,7 @@ function startGame() {
     name, hp: 100, exp: 0, lv: 1,
     stageIndex: 0, current: 0, hints: 1,
     items: { roppo: false, hanrei: false, ai: false },
-    gameOver: false, cleared: false,
+    gameOver: false, cleared: false, combo: 0,
     shuffledIndices: [],
     stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
   });

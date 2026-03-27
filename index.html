@@ -56,6 +56,10 @@
             <div id="timerBar" class="timer-bar"></div>
           </div>
           <span id="timerText" class="timer-text">30秒</span>
+          <span id="comboDisplay" class="combo-badge hidden"></span>
+        </div>
+        <div id="fatalWarning" class="fatal-warning hidden">
+          ⚠️ 危険問題 — 不正解でHP全消滅！
         </div>
         <p id="questionText"></p>
         <div class="quiz-actions">
@@ -67,11 +71,25 @@
 
       <section class="card hidden" id="resultSection">
         <h2>結果</h2>
+        <div id="scoreBanner" class="score-banner hidden">
+          <div id="scoreBannerLabel" class="score-banner-label"></div>
+          <div id="scoreBannerValue" class="score-banner-value"></div>
+        </div>
         <p id="resultText"></p>
         <button id="nextBtn">次へ</button>
         <button id="restartBtn" class="hidden">最初から</button>
       </section>
     </main>
+
+    <!-- ステージクリア演出 -->
+    <div id="stageClearOverlay" class="stage-clear-overlay hidden">
+      <div class="stage-clear-box">
+        <div class="stage-clear-title">STAGE CLEAR!</div>
+        <div id="stageClearNum" class="stage-clear-num"></div>
+        <div id="stageClearRole" class="stage-clear-role"></div>
+        <div id="stageClearGrade" class="stage-clear-grade-badge"></div>
+      </div>
+    </div>
 
     <script src="app.js"></script>
   </body>
