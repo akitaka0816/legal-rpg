@@ -25,14 +25,12 @@
   --ring: 0 0 0 3px rgba(56, 189, 248, 0.25);
 }
 
-html {
-  background: #010810; /* bg.js canvas のフォールバック */
-}
-
 body {
   margin: 0;
   font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
-  background: none; /* bg.js の canvas が背景を担う */
+  background: radial-gradient(1200px 520px at 12% -8%, #60a5fa55, transparent 60%),
+              radial-gradient(900px 520px at 92% 2%, #22d3ee44, transparent 55%),
+              linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
   color: var(--text-main);
   line-height: 1.65;
   font-size: var(--font-body);
