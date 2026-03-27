@@ -7,11 +7,19 @@
   --bg-bottom: #253a5f;
   --text-main: #e2e8f0;
   --text-sub: #94a3b8;
+  --text-strong: #f8fafc;
   --card-bg: rgba(27, 40, 67, 0.82);
   --card-border: rgba(125, 150, 186, 0.45);
   --card-shadow: 0 12px 28px rgba(2, 8, 23, 0.45);
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
+  --accent-info: #38bdf8;
+  --accent-success: #22c55e;
+  --accent-danger: #ef4444;
+  --font-h1: clamp(1.7rem, 2.6vw, 2.2rem);
+  --font-h2: clamp(1.02rem, 1.6vw, 1.2rem);
+  --font-body: 0.98rem;
+  --font-small: 0.86rem;
 }
 
 body {
@@ -21,7 +29,8 @@ body {
               radial-gradient(900px 520px at 92% 2%, #22d3ee44, transparent 55%),
               linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
   color: var(--text-main);
-  line-height: 1.6;
+  line-height: 1.65;
+  font-size: var(--font-body);
 }
 
 .container {
@@ -34,6 +43,8 @@ h1 {
   margin-bottom: 6px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  font-size: var(--font-h1);
+  color: var(--text-strong);
 }
 
 .subtitle {
@@ -54,8 +65,9 @@ h1 {
 .card h2 {
   margin-top: 0;
   margin-bottom: 14px;
-  font-size: 1.05rem;
-  color: #f1f5f9;
+  font-size: var(--font-h2);
+  color: var(--text-strong);
+  letter-spacing: 0.01em;
 }
 
 .status-grid {
@@ -74,7 +86,7 @@ h1 {
 }
 
 .status-grid > div span {
-  color: #f8fafc;
+  color: var(--text-strong);
   font-weight: 700;
   margin-left: 4px;
 }
@@ -86,7 +98,7 @@ h1 {
 }
 
 .achievement-title {
-  font-size: 0.9rem;
+  font-size: var(--font-small);
   color: #94a3b8;
   margin-bottom: 6px;
 }
@@ -98,8 +110,8 @@ h1 {
 }
 
 .event-info {
-  background: #172554;
-  border-left: 3px solid #60a5fa;
+  background: #102845;
+  border-left: 3px solid var(--accent-info);
   padding: 10px;
   border-radius: 6px;
   color: #bfdbfe;
@@ -113,7 +125,7 @@ input {
   border-radius: 10px;
   border: 1px solid #475569;
   background: #0b1220cc;
-  color: var(--text-main);
+  color: var(--text-strong);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -194,7 +206,7 @@ button:hover {
 }
 
 .timer-text {
-  font-size: 0.85rem;
+  font-size: var(--font-small);
   color: #94a3b8;
   min-width: 32px;
   text-align: right;
@@ -213,8 +225,8 @@ button:hover {
 }
 
 .fatal-warning {
-  background: #450a0a;
-  border: 2px solid #ef4444;
+  background: #4b1111;
+  border: 2px solid var(--accent-danger);
   color: #fca5a5;
   font-weight: bold;
   padding: 10px 14px;
@@ -249,7 +261,7 @@ button:hover {
 }
 
 .ranking-score {
-  color: #38bdf8;
+  color: var(--accent-info);
   font-weight: bold;
 }
 
@@ -340,13 +352,13 @@ button:hover {
   margin-bottom: 16px;
   border-radius: 12px;
   background: linear-gradient(135deg, #1e3a5f, #0f172a);
-  border: 2px solid #38bdf8;
+  border: 2px solid var(--accent-info);
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .score-banner.gameover {
   background: linear-gradient(135deg, #3f1212, #0f172a);
-  border-color: #ef4444;
+  border-color: var(--accent-danger);
 }
 
 .score-banner-label {
@@ -433,7 +445,7 @@ button:hover {
 }
 
 .btn-share.copied {
-  background: #15803d;
+  background: var(--accent-success);
 }
 
 .btn-secondary {
@@ -560,7 +572,7 @@ button:hover {
 .stats-bar-fill {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #2563eb, #38bdf8);
+  background: linear-gradient(90deg, var(--primary), var(--accent-info));
   transition: width 0.5s ease;
 }
 
@@ -615,9 +627,10 @@ button:hover {
 }
 
 #questionText {
-  font-size: 1.02rem;
+  font-size: 1.06rem;
   margin-bottom: 12px;
-  color: #f1f5f9;
+  color: var(--text-strong);
+  line-height: 1.7;
 }
 
 #choices {
