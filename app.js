@@ -45,7 +45,6 @@ const state = {
   name: "",
   hp: 100, exp: 0, lv: 1,
   stageIndex: 0, current: 0, hints: 1,
-  items: { roppo: false, hanrei: false, ai: false },
   gameOver: false, cleared: false, combo: 0,
   achievements: [],
   achievementMap: {},
@@ -63,7 +62,6 @@ const el = {
   statusSection:   document.getElementById("statusSection"),
   quizSection:     document.getElementById("quizSection"),
   resultSection:   document.getElementById("resultSection"),
-  itemSection:     document.getElementById("itemSection"),
   rankingSection:  document.getElementById("rankingSection"),
   playerName:      document.getElementById("playerName"),
   startBtn:        document.getElementById("startBtn"),
@@ -79,10 +77,6 @@ const el = {
   sProgress: document.getElementById("sProgress"),
   sStage:    document.getElementById("sStage"),
   sHint:     document.getElementById("sHint"),
-  itemRoppoBtn:  document.getElementById("itemRoppoBtn"),
-  itemHanreiBtn: document.getElementById("itemHanreiBtn"),
-  itemAIBtn:     document.getElementById("itemAIBtn"),
-  itemInfo:      document.getElementById("itemInfo"),
   timerBar:  document.getElementById("timerBar"),
   timerText: document.getElementById("timerText"),
   questionText:  document.getElementById("questionText"),
@@ -155,8 +149,7 @@ function timeUp() {
       state.hp = 0;
       msg = `⏰ 時間切れ！💀 致命的ミス — HP全消滅！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     } else {
-      const baseDamage = state.items.ai ? 10 : 20;
-      const damage = Math.max(1, baseDamage - (event.damageReduction || 0));
+      const damage = Math.max(1, 20 - (event.damageReduction || 0));
       state.hp = Math.max(0, state.hp - damage);
       msg = `⏰ 時間切れ！ HP -${damage}\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     }
@@ -261,12 +254,6 @@ function updateReviewBtn() {
 }
 
 // ── UI更新 ────────────────────────────────────────
-function syncItemButtons() {
-  el.itemRoppoBtn.disabled  = state.items.roppo;
-  el.itemHanreiBtn.disabled = state.items.hanrei;
-  el.itemAIBtn.disabled     = state.items.ai;
-}
-
 function updateStatus() {
   const perRun = state.shuffledIndices.length || STAGES[state.stageIndex].questionsPerRun;
   el.sName.textContent     = state.name;
@@ -284,7 +271,6 @@ function updateStatus() {
       ? state.achievements.join(" / ")
       : "未獲得";
   }
-  syncItemButtons();
 }
 
 function unlockAchievement(def) {
@@ -342,18 +328,12 @@ function showQuestion() {
 
   const choiceOrder = shuffle([...Array(q.choices.length).keys()]);
   currentCorrectIdx = choiceOrder.indexOf(q.answer);
-  const removableWrong = shuffle(choiceOrder.filter(i => i !== q.answer))
-    .slice(0, Math.floor((q.choices.length - 1) / 2));
 
   choiceOrder.forEach((origIdx, displayIdx) => {
     const b = document.createElement("button");
     b.className = "choice-btn";
     b.textContent = `${displayIdx + 1}. ${q.choices[origIdx]}`;
     b.addEventListener("click", () => answerQuestion(displayIdx));
-    if (!state.reviewMode && state.items.hanrei && removableWrong.includes(origIdx)) {
-      b.disabled = true;
-      b.textContent = `${displayIdx + 1}. ${q.choices[origIdx]}（判例DBで除外）`;
-    }
     el.choices.appendChild(b);
   });
 
@@ -420,8 +400,7 @@ function answerQuestion(selected) {
       state.hp = 0;
       msg += `💀 致命的ミス！ HP全消滅！\n`;
     } else {
-      const baseDamage = state.items.ai ? 10 : 20;
-      const damage = Math.max(1, baseDamage - (event.damageReduction || 0));
+      const damage = Math.max(1, 20 - (event.damageReduction || 0));
       state.hp = Math.max(0, state.hp - damage);
       msg += `❌ 不正解… HP -${damage}\n`;
     }
@@ -613,20 +592,6 @@ function showHint() {
   saveState();
 }
 
-function useItem(type) {
-  if (state.items[type]) return;
-  const msgs = {
-    roppo:  "六法を装備しました。ヒント残数 +1。",
-    hanrei: "判例DBを装備しました。問題ごとに一部選択肢を除外します。",
-    ai:     "生成AIアシストを装備しました。不正解時のHP減少が軽減されます。",
-  };
-  state.items[type] = true;
-  if (type === "roppo") state.hints += 1;
-  el.itemInfo.textContent = msgs[type];
-  updateStatus();
-  saveState();
-}
-
 // ── ゲーム開始 ─────────────────────────────────────
 function startGame() {
   const name = el.playerName.value.trim();
@@ -634,7 +599,6 @@ function startGame() {
   Object.assign(state, {
     name, hp: 100, exp: 0, lv: 1,
     stageIndex: 0, current: 0, hints: 1,
-    items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
     achievements: [],
     achievementMap: {},
@@ -664,7 +628,6 @@ function startReviewMode() {
     current: 0,
     hints: 1,
     shuffledIndices: [],
-    items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
     currentEvent: null,
   });
@@ -675,7 +638,6 @@ function startReviewMode() {
 function showGameUI() {
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
-  el.itemSection.classList.remove("hidden");
   updateStatus();
   showQuestion();
 }
@@ -685,7 +647,7 @@ function restartGame() {
   localStorage.removeItem(SAVE_KEY);
   el.playerName.value = "";
   el.startSection.classList.remove("hidden");
-  ["statusSection","itemSection","quizSection","resultSection"].forEach(id =>
+  ["statusSection","quizSection","resultSection"].forEach(id =>
     document.getElementById(id).classList.add("hidden")
   );
   updateReviewBtn();
@@ -700,7 +662,6 @@ function resumeOrShowStart() {
   el.playerName.value = state.name;
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
-  el.itemSection.classList.remove("hidden");
   updateStatus();
   const perRun = state.shuffledIndices.length;
   if (state.current < perRun && !state.gameOver && !state.cleared) {
@@ -719,9 +680,6 @@ el.playerName.addEventListener("keydown", e => { if (e.key === "Enter") startGam
 el.nextBtn.addEventListener("click", showQuestion);
 el.restartBtn.addEventListener("click", restartGame);
 el.hintBtn.addEventListener("click", showHint);
-el.itemRoppoBtn.addEventListener("click", () => useItem("roppo"));
-el.itemHanreiBtn.addEventListener("click", () => useItem("hanrei"));
-el.itemAIBtn.addEventListener("click", () => useItem("ai"));
 el.reviewBtn.addEventListener("click", startReviewMode);
 
 // ③ コピーボタン

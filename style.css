@@ -55,12 +55,6 @@ h1 {
   color: #facc15;
 }
 
-.item-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(170px, 1fr));
-  gap: 10px;
-}
-
 .quiz-actions {
   margin-bottom: 8px;
 }
@@ -80,11 +74,6 @@ h1 {
   border-radius: 6px;
   color: #bfdbfe;
   margin-bottom: 10px;
-}
-
-#itemInfo {
-  margin-top: 10px;
-  color: #cbd5e1;
 }
 
 input {
@@ -545,8 +534,7 @@ button:hover {
 }
 
 @media (max-width: 640px) {
-  .status-grid,
-  .item-grid {
+  .status-grid {
     grid-template-columns: 1fr;
   }
 }
