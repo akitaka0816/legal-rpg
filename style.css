@@ -3,12 +3,12 @@
 }
 
 :root {
-  --bg-top: #0b1222;
-  --bg-bottom: #0f172a;
+  --bg-top: #1b2a45;
+  --bg-bottom: #253a5f;
   --text-main: #e2e8f0;
   --text-sub: #94a3b8;
-  --card-bg: rgba(17, 24, 39, 0.88);
-  --card-border: rgba(71, 85, 105, 0.55);
+  --card-bg: rgba(27, 40, 67, 0.82);
+  --card-border: rgba(125, 150, 186, 0.45);
   --card-shadow: 0 12px 28px rgba(2, 8, 23, 0.45);
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
@@ -17,8 +17,8 @@
 body {
   margin: 0;
   font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
-  background: radial-gradient(1200px 500px at 15% -10%, #1e3a8a33, transparent 60%),
-              radial-gradient(800px 450px at 90% 0%, #0ea5e933, transparent 55%),
+  background: radial-gradient(1200px 520px at 12% -8%, #60a5fa55, transparent 60%),
+              radial-gradient(900px 520px at 92% 2%, #22d3ee44, transparent 55%),
               linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
   color: var(--text-main);
   line-height: 1.6;
@@ -132,6 +132,7 @@ button {
   cursor: pointer;
   margin-right: 8px;
   margin-bottom: 8px;
+  min-height: 42px;
   font-weight: 600;
   letter-spacing: 0.01em;
   transition: transform 0.14s ease, background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
@@ -458,17 +459,23 @@ button:hover {
 
 /* スタートボタン群 */
 .start-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .start-buttons-sub {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
   margin-top: 4px;
+}
+
+.start-buttons button,
+.start-buttons-sub button {
+  width: 100%;
+  margin: 0;
 }
 
 /* ⑧ ステージマップ */
@@ -635,6 +642,11 @@ button:hover {
   button {
     width: 100%;
     margin-right: 0;
+  }
+
+  .start-buttons,
+  .start-buttons-sub {
+    grid-template-columns: 1fr;
   }
 
   .status-grid {
