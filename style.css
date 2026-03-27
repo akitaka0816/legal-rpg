@@ -283,6 +283,77 @@ button:hover {
   letter-spacing: 2px;
 }
 
+/* ① 選択肢アニメーション */
+.choice-correct {
+  background: #15803d !important;
+  color: #fff !important;
+  animation: flashCorrect 0.6s ease forwards;
+}
+
+.choice-wrong {
+  background: #b91c1c !important;
+  color: #fff !important;
+  animation: shakeWrong 0.5s ease forwards;
+}
+
+@keyframes flashCorrect {
+  0%   { background: #15803d; box-shadow: none; }
+  40%  { background: #4ade80; box-shadow: 0 0 16px #4ade80; }
+  100% { background: #15803d; box-shadow: none; }
+}
+
+@keyframes shakeWrong {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX(5px); }
+}
+
+/* ② 復習モード */
+.btn-review {
+  background: #7c3aed;
+}
+
+.btn-review:hover {
+  background: #6d28d9;
+}
+
+.review-count {
+  display: inline-block;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 1px 7px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+.review-mode-badge {
+  display: inline-block;
+  background: #7c3aed;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 12px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ③ シェアボタン */
+.btn-share {
+  background: #0f766e;
+}
+
+.btn-share:hover {
+  background: #0d9488;
+}
+
+.btn-share.copied {
+  background: #15803d;
+}
+
 .btn-secondary {
   background: #334155;
 }
