@@ -1,11 +1,11 @@
 // ── ステージ定義 ───────────────────────────────────
 const STAGES = [
-  { id: 1, name: "入門編",   role: "新入社員",        questionsPerRun: 5 },
-  { id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 5 },
-  { id: 3, name: "応用実務", role: "法務担当",         questionsPerRun: 5 },
-  { id: 4, name: "実践編",   role: "シニア法務担当",   questionsPerRun: 5 },
-  { id: 5, name: "上級編",   role: "法務リーダー",     questionsPerRun: 5 },
-  { id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 5 },
+  { id: 1, name: "入門編",   role: "新入社員",        questionsPerRun: 6 },
+  { id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 6 },
+  { id: 3, name: "応用実務", role: "法務担当",         questionsPerRun: 6 },
+  { id: 4, name: "実践編",   role: "シニア法務担当",   questionsPerRun: 6 },
+  { id: 5, name: "上級編",   role: "法務リーダー",     questionsPerRun: 6 },
+  { id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 6 },
 ];
 const CLEARED_ROLE = "法務責任者";
 const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
@@ -201,6 +201,15 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+function ensureMinimumQuestions(pool, minCount = 5) {
+  if (pool.length >= minCount || pool.length === 0) return pool;
+  const extended = [...pool];
+  while (extended.length < minCount) {
+    extended.push(pool[(extended.length - pool.length) % pool.length]);
+  }
+  return shuffle(extended);
 }
 
 function buildShuffledIndices() {
@@ -720,7 +729,7 @@ function startReviewMode() {
 }
 
 function startThemePractice(theme) {
-  const pool = allQuestions.filter(q => q.theme === theme);
+  const pool = ensureMinimumQuestions(allQuestions.filter(q => q.theme === theme), 5);
   if (pool.length === 0) { alert("このテーマの問題が見つかりません。"); return; }
 
   const name = el.playerName.value.trim() || "プレイヤー";
