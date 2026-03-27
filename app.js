@@ -45,7 +45,7 @@ let allQuestions = [];
 const state = {
   name: "",
   hp: 100, exp: 0, lv: 1,
-  stageIndex: 0, current: 0, hints: 1,
+  stageIndex: 0, current: 0,
   gameOver: false, cleared: false, combo: 0,
   achievements: [],
   achievementMap: {},
@@ -89,12 +89,9 @@ const el = {
   sExp:      document.getElementById("sExp"),
   sProgress: document.getElementById("sProgress"),
   sStage:    document.getElementById("sStage"),
-  sHint:     document.getElementById("sHint"),
   timerBar:  document.getElementById("timerBar"),
   timerText: document.getElementById("timerText"),
   questionText:  document.getElementById("questionText"),
-  hintBtn:       document.getElementById("hintBtn"),
-  hintText:      document.getElementById("hintText"),
   choices:       document.getElementById("choices"),
   resultText:    document.getElementById("resultText"),
   nextBtn:       document.getElementById("nextBtn"),
@@ -350,7 +347,6 @@ function updateStatus() {
   el.sStage.textContent    = state.reviewMode
     ? "復習モード"
     : `Stage ${state.stageIndex + 1}/${STAGES.length} ${STAGES[state.stageIndex].name}`;
-  el.sHint.textContent     = String(state.hints);
   if (el.achievementList) {
     el.achievementList.textContent = state.achievements.length > 0
       ? state.achievements.join(" / ")
@@ -395,8 +391,6 @@ function showQuestion() {
   el.quizSection.classList.remove("hidden");
   el.resultSection.classList.add("hidden");
   el.shareBtn.classList.add("hidden");
-  el.hintText.classList.add("hidden");
-  el.hintText.textContent = "";
 
   if (!state.reviewMode && state.combo >= 2) {
     const mult = comboMultiplier(state.combo);
@@ -554,14 +548,13 @@ function handleAfterAnswer(msg, correct) {
       msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n次のステージ: ${STAGES[state.stageIndex + 1].name}`;
-      msg += `\n新役職: ${nextRole} / ヒント +1 獲得`;
+      msg += `\n新役職: ${nextRole}`;
       if (state.hp >= state.stageStartHp) {
         msg += unlockAchievement(ACHIEVEMENTS.noDamageStage);
       }
 
       state.stageIndex += 1;
       state.current = 0;
-      state.hints += 1;
       state.combo = 0;
       state.stageCorrect = 0;
       state.stageTotal = 0;
@@ -675,24 +668,13 @@ function renderRanking() {
   ).join("");
 }
 
-// ── ヒント・アイテム ───────────────────────────────
-function showHint() {
-  if (state.hints <= 0) { alert("ヒント残数がありません。"); return; }
-  const q = getActiveQuestions()[state.shuffledIndices[state.current]];
-  state.hints -= 1;
-  el.hintText.textContent = `ヒント: ${q.hint || "法令の趣旨と原則を確認しましょう。"}`;
-  el.hintText.classList.remove("hidden");
-  updateStatus();
-  saveState();
-}
-
 // ── ゲーム開始 ─────────────────────────────────────
 function startGame() {
   const name = el.playerName.value.trim();
   if (!name) { alert("プレイヤー名を入力してください。"); return; }
   Object.assign(state, {
     name, hp: 100, exp: 0, lv: 1,
-    stageIndex: 0, current: 0, hints: 1,
+    stageIndex: 0, current: 0,
     gameOver: false, cleared: false, combo: 0,
     achievements: [],
     achievementMap: {},
@@ -723,7 +705,6 @@ function startReviewMode() {
     reviewPool: pool,
     reviewCorrect: 0,
     current: 0,
-    hints: 1,
     shuffledIndices: [],
     gameOver: false, cleared: false, combo: 0,
     currentEvent: null,
@@ -745,7 +726,6 @@ function startThemePractice(theme) {
     reviewPool: pool,
     reviewCorrect: 0,
     current: 0,
-    hints: 99,
     shuffledIndices: [],
     gameOver: false, cleared: false, combo: 0,
     currentEvent: null,
@@ -798,7 +778,6 @@ el.startBtn.addEventListener("click", startGame);
 el.playerName.addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
 el.nextBtn.addEventListener("click", showQuestion);
 el.restartBtn.addEventListener("click", restartGame);
-el.hintBtn.addEventListener("click", showHint);
 el.reviewBtn.addEventListener("click", startReviewMode);
 
 // ③ コピーボタン

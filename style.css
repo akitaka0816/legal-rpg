@@ -97,18 +97,6 @@ h1 {
   line-height: 1.7;
 }
 
-.quiz-actions {
-  margin-bottom: 8px;
-}
-
-.hint-text {
-  background: #1f2937;
-  border-left: 3px solid #38bdf8;
-  padding: 10px;
-  border-radius: 6px;
-  color: #bae6fd;
-}
-
 .event-info {
   background: #172554;
   border-left: 3px solid #60a5fa;
