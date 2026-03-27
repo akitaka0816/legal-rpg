@@ -17,6 +17,13 @@ function comboMultiplier(combo) {
   return 1.0;
 }
 
+function speedBonus(remaining) {
+  if (remaining >= 25) return 0.5;
+  if (remaining >= 20) return 0.3;
+  if (remaining >= 15) return 0.1;
+  return 0;
+}
+
 const SAVE_KEY    = "legal_rpg_save_v3";
 const RANKING_KEY = "legal_rpg_ranking_v1";
 const WRONG_KEY   = "legal_rpg_wrong_v1";   // ② 復習用
@@ -330,12 +337,15 @@ function answerQuestion(selected) {
   if (correct) {
     state.combo += 1;
     const mult    = comboMultiplier(state.combo);
+    const speed   = speedBonus(timerRemaining);
     const baseExp = EXP_PER_STAGE[state.stageIndex] ?? 10;
     const gained  = Math.floor(baseExp * mult);
-    state.exp += gained;
+    const bonus   = Math.floor(baseExp * speed);
+    state.exp += gained + bonus;
     state.stageCorrect += 1;
     msg += `✅ 正解！ EXP +${gained}`;
     if (state.combo >= 2) msg += ` 🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`;
+    if (bonus > 0) msg += ` ⚡ 速答ボーナス +${bonus}`;
     msg += "\n";
     while (state.exp >= state.lv * 50) {
       state.lv += 1;
