@@ -309,9 +309,9 @@ function renderStats() {
 
 // ── UI更新 ────────────────────────────────────────
 function syncItemButtons() {
-  el.itemRoppoBtn.disabled  = state.items.roppo;
-  el.itemHanreiBtn.disabled = state.items.hanrei;
-  el.itemAIBtn.disabled     = state.items.ai;
+  if (el.itemRoppoBtn)  el.itemRoppoBtn.disabled  = state.items.roppo;
+  if (el.itemHanreiBtn) el.itemHanreiBtn.disabled = state.items.hanrei;
+  if (el.itemAIBtn)     el.itemAIBtn.disabled     = state.items.ai;
 }
 
 function updateStatus() {
