@@ -73,6 +73,23 @@ h1 {
   letter-spacing: 0.01em;
 }
 
+/* ステータス/結果は視認性重視でライト配色 */
+#statusSection,
+#resultSection {
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  color: #0f172a;
+  backdrop-filter: none;
+}
+
+#statusSection h2,
+#resultSection h2,
+#statusSection #resultText,
+#resultSection #resultText {
+  color: #0f172a;
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(150px, 1fr));
@@ -88,10 +105,20 @@ h1 {
   font-size: 0.92rem;
 }
 
+#statusSection .status-grid > div {
+  border: 1px solid #d2dbe8;
+  background: #f8fafc;
+  color: #334155;
+}
+
 .status-grid > div span {
   color: var(--text-strong);
   font-weight: 700;
   margin-left: 4px;
+}
+
+#statusSection .status-grid > div span {
+  color: #0f172a;
 }
 
 .achievement-wrap {
@@ -104,6 +131,10 @@ h1 {
   font-size: var(--font-small);
   color: #94a3b8;
   margin-bottom: 6px;
+}
+
+#statusSection .achievement-title {
+  color: #64748b;
 }
 
 .achievement-list {
