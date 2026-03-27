@@ -1,66 +1,151 @@
-let allStages = [];
+// ステージ定義 — ここに追加するだけで新ステージが増える
+const STAGES = [
+  { id: 1, name: "入門編",   role: "新入社員",        questionsPerRun: 5 },
+  { id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 5 },
+  { id: 3, name: "応用実務", role: "法務担当",         questionsPerRun: 5 },
+  { id: 4, name: "実践編",   role: "シニア法務担当",   questionsPerRun: 5 },
+  { id: 5, name: "上級編",   role: "法務リーダー",     questionsPerRun: 5 },
+  { id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 5 },
+];
+const CLEARED_ROLE = "法務責任者";
 
-const roles = ["新入社員", "法務担当", "シニア法務", "法務責任者"];
-const SAVE_KEY = "legal_rpg_save_v2";
+const SAVE_KEY = "legal_rpg_save_v3";
+const RANKING_KEY = "legal_rpg_ranking_v1";
+const TIMER_SEC = 30;
+
+let allQuestions = [];
 
 const state = {
   name: "",
   hp: 100,
   exp: 0,
   lv: 1,
-  roleIndex: 0,
   stageIndex: 0,
   current: 0,
   hints: 1,
-  items: {
-    roppo: false,
-    hanrei: false,
-    ai: false,
-  },
+  items: { roppo: false, hanrei: false, ai: false },
   gameOver: false,
+  cleared: false,
+  shuffledIndices: [],
+  stageCorrect: 0,
+  stageTotal: 0,
+  stageStartHp: 100,
+  totalScore: 0,
 };
 
 const el = {
-  startSection: document.getElementById("startSection"),
-  statusSection: document.getElementById("statusSection"),
-  quizSection: document.getElementById("quizSection"),
-  resultSection: document.getElementById("resultSection"),
-  itemSection: document.getElementById("itemSection"),
-  playerName: document.getElementById("playerName"),
-  startBtn: document.getElementById("startBtn"),
-  sName: document.getElementById("sName"),
-  sRole: document.getElementById("sRole"),
-  sLv: document.getElementById("sLv"),
-  sHp: document.getElementById("sHp"),
-  sExp: document.getElementById("sExp"),
+  startSection:    document.getElementById("startSection"),
+  statusSection:   document.getElementById("statusSection"),
+  quizSection:     document.getElementById("quizSection"),
+  resultSection:   document.getElementById("resultSection"),
+  itemSection:     document.getElementById("itemSection"),
+  rankingSection:  document.getElementById("rankingSection"),
+  playerName:      document.getElementById("playerName"),
+  startBtn:        document.getElementById("startBtn"),
+  showRankingBtn:  document.getElementById("showRankingBtn"),
+  clearRankingBtn: document.getElementById("clearRankingBtn"),
+  sName:     document.getElementById("sName"),
+  sRole:     document.getElementById("sRole"),
+  sLv:       document.getElementById("sLv"),
+  sHp:       document.getElementById("sHp"),
+  sExp:      document.getElementById("sExp"),
   sProgress: document.getElementById("sProgress"),
-  sStage: document.getElementById("sStage"),
-  sHint: document.getElementById("sHint"),
-  itemRoppoBtn: document.getElementById("itemRoppoBtn"),
+  sStage:    document.getElementById("sStage"),
+  sHint:     document.getElementById("sHint"),
+  itemRoppoBtn:  document.getElementById("itemRoppoBtn"),
   itemHanreiBtn: document.getElementById("itemHanreiBtn"),
-  itemAIBtn: document.getElementById("itemAIBtn"),
-  itemInfo: document.getElementById("itemInfo"),
+  itemAIBtn:     document.getElementById("itemAIBtn"),
+  itemInfo:      document.getElementById("itemInfo"),
+  timerBar:  document.getElementById("timerBar"),
+  timerText: document.getElementById("timerText"),
   questionText: document.getElementById("questionText"),
-  hintBtn: document.getElementById("hintBtn"),
-  hintText: document.getElementById("hintText"),
-  choices: document.getElementById("choices"),
+  hintBtn:   document.getElementById("hintBtn"),
+  hintText:  document.getElementById("hintText"),
+  choices:   document.getElementById("choices"),
   resultText: document.getElementById("resultText"),
-  nextBtn: document.getElementById("nextBtn"),
+  nextBtn:    document.getElementById("nextBtn"),
   restartBtn: document.getElementById("restartBtn"),
+  rankingList: document.getElementById("rankingList"),
 };
 
-function buildStages(questions) {
-  allStages = [
-    { name: "初級", questions: questions.filter(q => q.difficulty === 1) },
-    { name: "中級", questions: questions.filter(q => q.difficulty === 2) },
-    { name: "上級", questions: questions.filter(q => q.difficulty === 3) },
-  ];
+// ── タイマー ──────────────────────────────────────
+let timerInterval = null;
+let timerRemaining = TIMER_SEC;
+
+function startTimer() {
+  clearTimer();
+  timerRemaining = TIMER_SEC;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timerRemaining -= 1;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      clearTimer();
+      timeUp();
+    }
+  }, 1000);
 }
 
-function getCurrentQuestions() {
-  return allStages[state.stageIndex].questions;
+function clearTimer() {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
 }
 
+function updateTimerDisplay() {
+  const pct = (timerRemaining / TIMER_SEC) * 100;
+  el.timerBar.style.width = pct + "%";
+  el.timerText.textContent = `${timerRemaining}秒`;
+  if (timerRemaining <= 10) {
+    el.timerBar.style.background = "#ef4444";
+  } else if (timerRemaining <= 20) {
+    el.timerBar.style.background = "#f59e0b";
+  } else {
+    el.timerBar.style.background = "#22c55e";
+  }
+}
+
+function timeUp() {
+  const damage = state.items.ai ? 10 : 20;
+  state.hp -= damage;
+  state.stageTotal += 1;
+  const q = getStageQuestions()[state.shuffledIndices[state.current]];
+  state.current += 1;
+  handleAfterAnswer(`⏰ 時間切れ！ HP -${damage}\n解説: ${q.explanation}`, false);
+}
+
+// ── ステージ・問題管理 ─────────────────────────────
+function getStageQuestions() {
+  const stageId = STAGES[state.stageIndex].id;
+  return allQuestions.filter(q => q.stage === stageId);
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildShuffledIndices() {
+  const qs = getStageQuestions();
+  const perRun = STAGES[state.stageIndex].questionsPerRun;
+  state.shuffledIndices = shuffle([...Array(qs.length).keys()]).slice(0, perRun);
+}
+
+function currentRole() {
+  if (state.cleared) return CLEARED_ROLE;
+  return STAGES[state.stageIndex].role;
+}
+
+function totalStages() {
+  return STAGES.length;
+}
+
+// ── セーブ ─────────────────────────────────────────
 function saveState() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(state));
 }
@@ -69,36 +154,38 @@ function loadState() {
   const raw = localStorage.getItem(SAVE_KEY);
   if (!raw) return false;
   try {
-    const parsed = JSON.parse(raw);
-    Object.assign(state, parsed);
+    Object.assign(state, JSON.parse(raw));
     return true;
   } catch {
     return false;
   }
 }
 
+// ── UI更新 ─────────────────────────────────────────
 function syncItemButtons() {
-  el.itemRoppoBtn.disabled = state.items.roppo;
+  el.itemRoppoBtn.disabled  = state.items.roppo;
   el.itemHanreiBtn.disabled = state.items.hanrei;
-  el.itemAIBtn.disabled = state.items.ai;
+  el.itemAIBtn.disabled     = state.items.ai;
 }
 
 function updateStatus() {
-  el.sName.textContent = state.name;
-  el.sRole.textContent = roles[state.roleIndex];
-  el.sLv.textContent = String(state.lv);
-  el.sHp.textContent = String(state.hp);
-  el.sExp.textContent = String(state.exp);
-  const qs = getCurrentQuestions();
-  el.sProgress.textContent = `${Math.min(state.current, qs.length)}/${qs.length}`;
-  el.sStage.textContent = allStages[state.stageIndex].name;
-  el.sHint.textContent = String(state.hints);
+  const perRun = state.shuffledIndices.length || STAGES[state.stageIndex].questionsPerRun;
+  el.sName.textContent     = state.name;
+  el.sRole.textContent     = currentRole();
+  el.sLv.textContent       = String(state.lv);
+  el.sHp.textContent       = String(state.hp);
+  el.sExp.textContent      = String(state.exp);
+  el.sProgress.textContent = `${Math.min(state.current, perRun)}/${perRun}`;
+  el.sStage.textContent    = `Stage ${state.stageIndex + 1}/${totalStages()} ${STAGES[state.stageIndex].name}`;
+  el.sHint.textContent     = String(state.hints);
   syncItemButtons();
 }
 
+// ── 問題表示 ───────────────────────────────────────
 function showQuestion() {
-  const qs = getCurrentQuestions();
-  const q = qs[state.current];
+  const qs = getStageQuestions();
+  const q  = qs[state.shuffledIndices[state.current]];
+
   el.quizSection.classList.remove("hidden");
   el.resultSection.classList.add("hidden");
   el.hintText.classList.add("hidden");
@@ -117,48 +204,86 @@ function showQuestion() {
     }
     el.choices.appendChild(b);
   });
+
+  startTimer();
   saveState();
 }
 
+// ── 回答処理 ───────────────────────────────────────
 function answerQuestion(selected) {
-  const qs = getCurrentQuestions();
-  const q = qs[state.current];
+  clearTimer();
+  const qs = getStageQuestions();
+  const q  = qs[state.shuffledIndices[state.current]];
   const correct = selected === q.answer;
   let msg = "";
 
+  state.stageTotal += 1;
+
   if (correct) {
     state.exp += 10;
-    msg += "正解！ EXP +10\n";
+    state.stageCorrect += 1;
+    msg += "✅ 正解！ EXP +10\n";
+    // EXP レベルアップ（役職は変わらず、スコア・称号のみ）
+    if (state.exp >= state.lv * 30) {
+      state.lv += 1;
+      msg += `⬆️ レベルアップ！ LV${state.lv}\n`;
+    }
   } else {
     const damage = state.items.ai ? 10 : 20;
     state.hp -= damage;
-    msg += `不正解… HP -${damage}\n`;
-  }
-
-  if (state.exp >= state.lv * 30 && state.lv < roles.length) {
-    state.lv += 1;
-    state.roleIndex = Math.min(state.roleIndex + 1, roles.length - 1);
-    msg += `レベルアップ！ LV${state.lv} / 役職: ${roles[state.roleIndex]}\n`;
+    msg += `❌ 不正解… HP -${damage}\n`;
   }
 
   msg += `解説: ${q.explanation}`;
   state.current += 1;
 
+  handleAfterAnswer(msg, correct);
+}
+
+function handleAfterAnswer(msg, correct) {
+  const perRun = state.shuffledIndices.length;
+
   if (state.hp <= 0) {
     state.gameOver = true;
-    msg += "\n\nゲームオーバー。法務リスク管理の見直しが必要です。";
+    const score = calcScore();
+    state.totalScore = score;
+    saveRanking(state.name, score, "ゲームオーバー");
+    msg += `\n\nゲームオーバー。法務リスク管理の見直しが必要です。\nスコア: ${score}`;
     el.nextBtn.classList.add("hidden");
     el.restartBtn.classList.remove("hidden");
-  } else if (state.current >= qs.length) {
-    if (state.stageIndex < allStages.length - 1) {
+
+  } else if (state.current >= perRun) {
+    // ステージクリア
+    const grade = calcGrade(state.stageCorrect, state.stageTotal, state.hp, state.stageStartHp);
+
+    if (state.stageIndex < STAGES.length - 1) {
+      msg += `\n\n--- ステージ ${state.stageIndex + 1} クリア！---`;
+      msg += `\n評価: ${grade.label}（${grade.reason}）`;
+      msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
+      msg += `\n次のステージへ: ${STAGES[state.stageIndex + 1].name}`;
+      msg += `\n役職: ${STAGES[state.stageIndex].role} → ${STAGES[state.stageIndex + 1].role}`;
+      msg += `\nヒント +1 獲得`;
+
       state.stageIndex += 1;
       state.current = 0;
       state.hints += 1;
-      msg += `\n\nステージクリア！ 次は ${allStages[state.stageIndex].name} です。ヒント+1。`;
+      state.stageCorrect = 0;
+      state.stageTotal = 0;
+      state.stageStartHp = state.hp;
+      buildShuffledIndices();
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
+
     } else {
-      msg += "\n\n最終ステージクリア！法務責任者への道が開けました。";
+      // 全ステージクリア
+      state.cleared = true;
+      const score = calcScore();
+      state.totalScore = score;
+      saveRanking(state.name, score, grade.label);
+      msg += `\n\n🏆 全ステージクリア！法務責任者に就任しました！`;
+      msg += `\n評価: ${grade.label}（${grade.reason}）`;
+      msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
+      msg += `\n最終スコア: ${score}`;
       el.nextBtn.classList.add("hidden");
       el.restartBtn.classList.remove("hidden");
     }
@@ -174,12 +299,47 @@ function answerQuestion(selected) {
   saveState();
 }
 
-function showHint() {
-  if (state.hints <= 0) {
-    alert("ヒント残数がありません。");
+// ── 評価・スコア ───────────────────────────────────
+function calcGrade(correct, total, hp, startHp) {
+  const accuracy = total > 0 ? correct / total : 0;
+  const hpRate   = startHp > 0 ? hp / startHp : 0;
+  const combined = accuracy * 0.7 + hpRate * 0.3;
+  if (combined >= 0.9) return { label: "S", reason: "完璧な法務判断力" };
+  if (combined >= 0.75) return { label: "A", reason: "優秀な成績" };
+  if (combined >= 0.55) return { label: "B", reason: "合格水準" };
+  return { label: "C", reason: "要復習" };
+}
+
+function calcScore() {
+  return state.exp * 10 + state.hp * 5 + state.lv * 50 + (state.stageIndex + 1) * 200;
+}
+
+// ── ランキング ─────────────────────────────────────
+function saveRanking(name, score, grade) {
+  let ranking = [];
+  try { ranking = JSON.parse(localStorage.getItem(RANKING_KEY) || "[]"); } catch {}
+  ranking.push({ name, score, grade, date: new Date().toLocaleDateString("ja-JP") });
+  ranking.sort((a, b) => b.score - a.score);
+  localStorage.setItem(RANKING_KEY, JSON.stringify(ranking.slice(0, 10)));
+}
+
+function renderRanking() {
+  let ranking = [];
+  try { ranking = JSON.parse(localStorage.getItem(RANKING_KEY) || "[]"); } catch {}
+  if (ranking.length === 0) {
+    el.rankingList.innerHTML = "<p>まだ記録がありません。</p>";
     return;
   }
-  const q = getCurrentQuestions()[state.current];
+  const medals = ["🥇", "🥈", "🥉"];
+  el.rankingList.innerHTML = ranking.slice(0, 5).map((r, i) =>
+    `<div class="ranking-row">${medals[i] || `${i + 1}.`} <span class="ranking-name">${r.name}</span> <span class="ranking-score">${r.score}pt</span> <span class="ranking-grade grade-${r.grade}">${r.grade}</span> <span class="ranking-date">${r.date}</span></div>`
+  ).join("");
+}
+
+// ── ヒント・アイテム ───────────────────────────────
+function showHint() {
+  if (state.hints <= 0) { alert("ヒント残数がありません。"); return; }
+  const q = getStageQuestions()[state.shuffledIndices[state.current]];
   state.hints -= 1;
   el.hintText.textContent = `ヒント: ${q.hint || "法令の趣旨と原則を確認しましょう。"}`;
   el.hintText.classList.remove("hidden");
@@ -189,38 +349,33 @@ function showHint() {
 
 function useItem(type) {
   if (state.items[type]) return;
-  if (type === "roppo") {
-    state.items.roppo = true;
-    state.hints += 1;
-    el.itemInfo.textContent = "六法を装備しました。ヒント残数 +1。";
-  } else if (type === "hanrei") {
-    state.items.hanrei = true;
-    el.itemInfo.textContent = "判例DBを装備しました。問題ごとに一部選択肢を除外します。";
-  } else if (type === "ai") {
-    state.items.ai = true;
-    el.itemInfo.textContent = "生成AIアシストを装備しました。不正解時のHP減少が軽減されます。";
-  }
+  const msgs = {
+    roppo:  "六法を装備しました。ヒント残数 +1。",
+    hanrei: "判例DBを装備しました。問題ごとに一部選択肢を除外します。",
+    ai:     "生成AIアシストを装備しました。不正解時のHP減少が軽減されます。",
+  };
+  state.items[type] = true;
+  if (type === "roppo") state.hints += 1;
+  el.itemInfo.textContent = msgs[type];
   updateStatus();
   saveState();
 }
 
+// ── ゲーム開始・リスタート ─────────────────────────
 function startGame() {
   const name = el.playerName.value.trim();
-  if (!name) {
-    alert("プレイヤー名を入力してください。");
-    return;
-  }
-  state.name = name;
-  state.hp = 100;
-  state.exp = 0;
-  state.lv = 1;
-  state.roleIndex = 0;
-  state.stageIndex = 0;
-  state.current = 0;
-  state.hints = 1;
-  state.items = { roppo: false, hanrei: false, ai: false };
-  state.gameOver = false;
+  if (!name) { alert("プレイヤー名を入力してください。"); return; }
 
+  Object.assign(state, {
+    name, hp: 100, exp: 0, lv: 1,
+    stageIndex: 0, current: 0, hints: 1,
+    items: { roppo: false, hanrei: false, ai: false },
+    gameOver: false, cleared: false,
+    shuffledIndices: [],
+    stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
+  });
+
+  buildShuffledIndices();
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
   el.itemSection.classList.remove("hidden");
@@ -230,30 +385,30 @@ function startGame() {
 }
 
 function restartGame() {
+  clearTimer();
   localStorage.removeItem(SAVE_KEY);
   el.playerName.value = "";
-  el.startSection.classList.remove("hidden");
-  el.statusSection.classList.add("hidden");
-  el.itemSection.classList.add("hidden");
-  el.quizSection.classList.add("hidden");
-  el.resultSection.classList.add("hidden");
+  ["startSection"].forEach(id => document.getElementById(id).classList.remove("hidden"));
+  ["statusSection","itemSection","quizSection","resultSection"].forEach(id =>
+    document.getElementById(id).classList.add("hidden")
+  );
 }
 
 function resumeOrShowStart() {
-  if (!loadState() || !state.name) {
-    return;
-  }
+  if (!loadState() || !state.name) return;
+  if (!state.shuffledIndices || state.shuffledIndices.length === 0) buildShuffledIndices();
+
   const resume = confirm("保存データがあります。続きから再開しますか？");
-  if (!resume) {
-    localStorage.removeItem(SAVE_KEY);
-    return;
-  }
+  if (!resume) { localStorage.removeItem(SAVE_KEY); return; }
+
   el.playerName.value = state.name;
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
   el.itemSection.classList.remove("hidden");
   updateStatus();
-  if (state.current < getCurrentQuestions().length && !state.gameOver) {
+
+  const perRun = state.shuffledIndices.length;
+  if (state.current < perRun && !state.gameOver && !state.cleared) {
     showQuestion();
   } else {
     el.resultSection.classList.remove("hidden");
@@ -263,6 +418,7 @@ function resumeOrShowStart() {
   }
 }
 
+// ── イベント ───────────────────────────────────────
 el.startBtn.addEventListener("click", startGame);
 el.nextBtn.addEventListener("click", showQuestion);
 el.restartBtn.addEventListener("click", restartGame);
@@ -271,10 +427,23 @@ el.itemRoppoBtn.addEventListener("click", () => useItem("roppo"));
 el.itemHanreiBtn.addEventListener("click", () => useItem("hanrei"));
 el.itemAIBtn.addEventListener("click", () => useItem("ai"));
 
+el.showRankingBtn.addEventListener("click", () => {
+  renderRanking();
+  el.rankingSection.classList.toggle("hidden");
+});
+
+el.clearRankingBtn.addEventListener("click", () => {
+  if (confirm("ランキングを全件削除しますか？")) {
+    localStorage.removeItem(RANKING_KEY);
+    renderRanking();
+  }
+});
+
+// ── データ読み込み ─────────────────────────────────
 fetch("questions.json")
   .then(r => r.json())
   .then(questions => {
-    buildStages(questions);
+    allQuestions = questions;
     resumeOrShowStart();
   })
   .catch(() => {

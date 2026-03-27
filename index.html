@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>法務RPG - Stage 2</title>
+    <title>法務RPG</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <main class="container">
-      <h1>法務RPG（Stage 2）</h1>
+      <h1>法務RPG</h1>
       <p class="subtitle">新入社員から法務責任者を目指すクイズRPG</p>
 
       <section class="card" id="startSection">
@@ -16,6 +16,13 @@
         <label for="playerName">プレイヤー名</label>
         <input id="playerName" type="text" placeholder="名前を入力" />
         <button id="startBtn">開始</button>
+        <button id="showRankingBtn" class="btn-secondary">ランキング</button>
+      </section>
+
+      <section class="card hidden" id="rankingSection">
+        <h2>🏆 ランキング（Top 5）</h2>
+        <div id="rankingList"></div>
+        <button id="clearRankingBtn" class="btn-danger">クリア</button>
       </section>
 
       <section class="card hidden" id="statusSection">
@@ -44,6 +51,12 @@
 
       <section class="card hidden" id="quizSection">
         <h2>クイズ</h2>
+        <div class="timer-wrap">
+          <div class="timer-bar-bg">
+            <div id="timerBar" class="timer-bar"></div>
+          </div>
+          <span id="timerText" class="timer-text">30秒</span>
+        </div>
         <p id="questionText"></p>
         <div class="quiz-actions">
           <button id="hintBtn">ヒントを見る</button>
