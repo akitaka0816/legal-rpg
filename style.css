@@ -8,7 +8,7 @@
   --text-main: #e2e8f0;
   --text-sub: #94a3b8;
   --text-strong: #f8fafc;
-  --card-bg: rgba(27, 40, 67, 0.82);
+  --card-bg: rgba(12, 22, 45, 0.88);
   --card-border: rgba(125, 150, 186, 0.45);
   --card-shadow: 0 12px 28px rgba(2, 8, 23, 0.45);
   --primary: #2563eb;
@@ -22,12 +22,14 @@
   --font-small: 0.86rem;
 }
 
+html {
+  background: #010810; /* bg.js canvas のフォールバック */
+}
+
 body {
   margin: 0;
   font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
-  background: radial-gradient(1200px 520px at 12% -8%, #60a5fa55, transparent 60%),
-              radial-gradient(900px 520px at 92% 2%, #22d3ee44, transparent 55%),
-              linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+  background: none; /* bg.js の canvas が背景を担う */
   color: var(--text-main);
   line-height: 1.65;
   font-size: var(--font-body);
