@@ -23,7 +23,6 @@
         <div class="start-buttons-sub">
           <button id="stageMapBtn" class="btn-secondary">📍 ステージマップ</button>
           <button id="statsBtn" class="btn-secondary">📊 正答率統計</button>
-          <button id="themeBtn" class="btn-secondary">🎯 テーマ練習</button>
         </div>
       </section>
 
@@ -42,13 +41,6 @@
         <button class="btn-secondary panel-close-btn" data-close-panel>← トップへ戻る</button>
       </section>
 
-      <!-- ④ テーマ別練習 -->
-      <section class="card hidden" id="themePracticeSection">
-        <h2>🎯 テーマ別練習</h2>
-        <p class="subtitle" style="margin:0 0 12px">HP/EXP変動なしの練習モードです</p>
-        <div id="themeGrid" class="theme-grid"></div>
-        <button class="btn-secondary panel-close-btn" data-close-panel>← トップへ戻る</button>
-      </section>
 
       <section class="card hidden" id="rankingSection">
         <h2>🏆 ランキング（Top 5）</h2>
@@ -87,7 +79,10 @@
           ⚠️ 危険問題 — 不正解でHP全消滅！
         </div>
         <p id="questionText"></p>
-        <p id="eventInfo" class="event-info hidden"></p>
+        <div class="quiz-actions">
+          <button id="hintBtn">ヒントを見る</button>
+        </div>
+        <p id="hintText" class="hint-text hidden"></p>
         <div id="choices"></div>
       </section>
 

@@ -1,13 +1,13 @@
 // ── ステージ定義 ───────────────────────────────────
 const STAGES = [
-  { id: 1, name: "入門編",   role: "新入社員",        questionsPerRun: 6 },
-  { id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 6 },
-  { id: 3, name: "応用実務", role: "法務担当",         questionsPerRun: 6 },
-  { id: 4, name: "実践編",   role: "シニア法務担当",   questionsPerRun: 6 },
-  { id: 5, name: "上級編",   role: "法務リーダー",     questionsPerRun: 6 },
-  { id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 6 },
+  { id: 1, name: "入門編",   role: "新入社員",        questionsPerRun: 5 },
+  { id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 5 },
+  { id: 3, name: "応用実務", role: "法務担当",         questionsPerRun: 5 },
+  { id: 4, name: "実践編",   role: "シニア法務担当",   questionsPerRun: 5 },
+  { id: 5, name: "上級編",   role: "法務リーダー",     questionsPerRun: 5 },
+  { id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 5 },
 ];
-const CLEARED_ROLE = "法務責任者";
+const CLEARED_ROLE  = "法務責任者";
 const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
 
 function comboMultiplier(combo) {
@@ -24,40 +24,23 @@ function speedBonus(remaining) {
   return 0;
 }
 
-const SAVE_KEY    = "legal_rpg_save_v3";
-const RANKING_KEY = "legal_rpg_ranking_v1";
-const WRONG_KEY   = "legal_rpg_wrong_v1";   // ② 復習用
-const STATS_KEY   = "legal_rpg_stats_v1";
-const TIMER_SEC   = 30;
-const QUESTION_EVENTS = [
-  { id: "focus", label: "集中モード", text: "この問題はEXPボーナス +20%", expRate: 1.2, damageReduction: 0, timerDelta: 0 },
-  { id: "guard", label: "守りの構え", text: "この問題は被ダメージ -5", expRate: 1.0, damageReduction: 5, timerDelta: 0 },
-  { id: "rush", label: "緊急対応", text: "この問題は制限時間 -5秒 / EXP +30%", expRate: 1.3, damageReduction: 0, timerDelta: -5 },
-];
-const ACHIEVEMENTS = {
-  combo3: { key: "combo3", label: "🔥 3コンボ達成" },
-  fatalClear: { key: "fatalClear", label: "💀 即死問題クリア" },
-  noDamageStage: { key: "noDamageStage", label: "🛡 ノーダメージステージ" },
-};
+const SAVE_KEY     = "legal_rpg_save_v3";
+const RANKING_KEY  = "legal_rpg_ranking_v1";
+const WRONG_KEY    = "legal_rpg_wrong_v1";
+const PROGRESS_KEY = "legal_rpg_progress_v1";
+const STATS_KEY    = "legal_rpg_stats_v1";
+const TIMER_SEC    = 30;
 
 let allQuestions = [];
 
 const state = {
-  name: "",
-  hp: 100, exp: 0, lv: 1,
-  stageIndex: 0, current: 0,
+  name: "", hp: 100, exp: 0, lv: 1,
+  stageIndex: 0, current: 0, hints: 1,
+  items: { roppo: false, hanrei: false, ai: false },
   gameOver: false, cleared: false, combo: 0,
-  achievements: [],
-  achievementMap: {},
-  currentEvent: null,
   shuffledIndices: [],
   stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
-  // ② 復習モード
-  reviewMode: false,
-  reviewPool: [],
-  reviewCorrect: 0,
-  practiceMode: false,
-  practiceTheme: "",
+  reviewMode: false, reviewPool: [], reviewCorrect: 0,
 };
 
 const el = {
@@ -65,23 +48,21 @@ const el = {
   statusSection:   document.getElementById("statusSection"),
   quizSection:     document.getElementById("quizSection"),
   resultSection:   document.getElementById("resultSection"),
+  itemSection:     document.getElementById("itemSection"),
   rankingSection:  document.getElementById("rankingSection"),
+  stageMapSection: document.getElementById("stageMapSection"),
+  statsSection:    document.getElementById("statsSection"),
   playerName:      document.getElementById("playerName"),
   startBtn:        document.getElementById("startBtn"),
   showRankingBtn:  document.getElementById("showRankingBtn"),
   clearRankingBtn: document.getElementById("clearRankingBtn"),
-  reviewBtn:       document.getElementById("reviewBtn"),
-  reviewCount:     document.getElementById("reviewCount"),
   stageMapBtn:     document.getElementById("stageMapBtn"),
   statsBtn:        document.getElementById("statsBtn"),
-  themeBtn:        document.getElementById("themeBtn"),
-  stageMapSection: document.getElementById("stageMapSection"),
-  statsSection:    document.getElementById("statsSection"),
-  themePracticeSection: document.getElementById("themePracticeSection"),
+  reviewBtn:       document.getElementById("reviewBtn"),
+  reviewCount:     document.getElementById("reviewCount"),
   stageMapGrid:    document.getElementById("stageMapGrid"),
   statsContent:    document.getElementById("statsContent"),
   clearStatsBtn:   document.getElementById("clearStatsBtn"),
-  themeGrid:       document.getElementById("themeGrid"),
   sName:     document.getElementById("sName"),
   sRole:     document.getElementById("sRole"),
   sLv:       document.getElementById("sLv"),
@@ -89,38 +70,42 @@ const el = {
   sExp:      document.getElementById("sExp"),
   sProgress: document.getElementById("sProgress"),
   sStage:    document.getElementById("sStage"),
+  sHint:     document.getElementById("sHint"),
+  itemRoppoBtn:  document.getElementById("itemRoppoBtn"),
+  itemHanreiBtn: document.getElementById("itemHanreiBtn"),
+  itemAIBtn:     document.getElementById("itemAIBtn"),
+  itemInfo:      document.getElementById("itemInfo"),
   timerBar:  document.getElementById("timerBar"),
   timerText: document.getElementById("timerText"),
   questionText:  document.getElementById("questionText"),
+  hintBtn:       document.getElementById("hintBtn"),
+  hintText:      document.getElementById("hintText"),
   choices:       document.getElementById("choices"),
+  comboDisplay:  document.getElementById("comboDisplay"),
+  fatalWarning:  document.getElementById("fatalWarning"),
   resultText:    document.getElementById("resultText"),
   nextBtn:       document.getElementById("nextBtn"),
   restartBtn:    document.getElementById("restartBtn"),
   shareBtn:      document.getElementById("shareBtn"),
+  scoreBanner:      document.getElementById("scoreBanner"),
+  scoreBannerLabel: document.getElementById("scoreBannerLabel"),
+  scoreBannerValue: document.getElementById("scoreBannerValue"),
   rankingList:   document.getElementById("rankingList"),
   stageClearOverlay: document.getElementById("stageClearOverlay"),
   stageClearNum:     document.getElementById("stageClearNum"),
   stageClearRole:    document.getElementById("stageClearRole"),
   stageClearGrade:   document.getElementById("stageClearGrade"),
-  comboDisplay:  document.getElementById("comboDisplay"),
-  fatalWarning:  document.getElementById("fatalWarning"),
-  scoreBanner:      document.getElementById("scoreBanner"),
-  scoreBannerLabel: document.getElementById("scoreBannerLabel"),
-  scoreBannerValue: document.getElementById("scoreBannerValue"),
-  achievementList:  document.getElementById("achievementList"),
-  eventInfo:        document.getElementById("eventInfo"),
 };
 
 // ── タイマー ──────────────────────────────────────
-let timerInterval = null;
-let timerRemaining = TIMER_SEC;
-let currentTimerSec = TIMER_SEC;
+let timerInterval   = null;
+let timerRemaining  = TIMER_SEC;
 let currentCorrectIdx = 0;
-let isAnswering = false;
+let isAnswering     = false;
 
 function startTimer() {
   clearTimer();
-  timerRemaining = currentTimerSec;
+  timerRemaining = TIMER_SEC;
   updateTimerDisplay();
   timerInterval = setInterval(() => {
     timerRemaining -= 1;
@@ -134,7 +119,7 @@ function clearTimer() {
 }
 
 function updateTimerDisplay() {
-  const pct = (timerRemaining / Math.max(1, currentTimerSec)) * 100;
+  const pct = (timerRemaining / TIMER_SEC) * 100;
   el.timerBar.style.width = pct + "%";
   el.timerText.textContent = `${timerRemaining}秒`;
   el.timerBar.style.background =
@@ -145,40 +130,32 @@ function timeUp() {
   if (isAnswering) return;
   isAnswering = true;
   const q = getActiveQuestions()[state.shuffledIndices[state.current]];
-
-  // ① 正解ボタンを光らせてから結果へ
   highlightChoices(-1);
-
   state.stageTotal += 1;
   state.combo = 0;
-
+  updateStats(q.theme, false);
   let msg = "";
-  const event = state.currentEvent || { damageReduction: 0 };
   if (!state.reviewMode) {
     if (q.fatal) {
       state.hp = 0;
       msg = `⏰ 時間切れ！💀 致命的ミス — HP全消滅！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     } else {
-      const damage = Math.max(1, 20 - (event.damageReduction || 0));
+      const damage = state.items.ai ? 10 : 20;
       state.hp = Math.max(0, state.hp - damage);
       msg = `⏰ 時間切れ！ HP -${damage}\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     }
-    // ② 時間切れも間違えた問題として記録
     saveWrongAnswer(q.id);
   } else {
     msg = `⏰ 時間切れ！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
   }
-
   state.current += 1;
   setTimeout(() => handleAfterAnswer(msg, false), 700);
 }
 
-// ① ボタンハイライト（selectedDisplayIdx=-1 は時間切れ）
 function highlightChoices(selectedDisplayIdx) {
-  const buttons = Array.from(el.choices.querySelectorAll("button"));
-  buttons.forEach((btn, i) => {
+  Array.from(el.choices.querySelectorAll("button")).forEach((btn, i) => {
     btn.disabled = true;
-    if (i === currentCorrectIdx) btn.classList.add("choice-correct");
+    if (i === currentCorrectIdx)       btn.classList.add("choice-correct");
     else if (i === selectedDisplayIdx) btn.classList.add("choice-wrong");
   });
 }
@@ -189,7 +166,6 @@ function getStageQuestions() {
   return allQuestions.filter(q => q.stage === stageId);
 }
 
-// ② 復習モードはreviewPool、通常はステージ問題
 function getActiveQuestions() {
   return state.reviewMode ? state.reviewPool : getStageQuestions();
 }
@@ -201,15 +177,6 @@ function shuffle(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
-}
-
-function ensureMinimumQuestions(pool, minCount = 5) {
-  if (pool.length >= minCount || pool.length === 0) return pool;
-  const extended = [...pool];
-  while (extended.length < minCount) {
-    extended.push(pool[(extended.length - pool.length) % pool.length]);
-  }
-  return shuffle(extended);
 }
 
 function buildShuffledIndices() {
@@ -235,112 +202,23 @@ function saveState() {
 function loadState() {
   const raw = localStorage.getItem(SAVE_KEY);
   if (!raw) return false;
-  try {
-    Object.assign(state, JSON.parse(raw));
-    if (!Array.isArray(state.achievements)) state.achievements = [];
-    if (!state.achievementMap || typeof state.achievementMap !== "object") state.achievementMap = {};
-    if (!state.currentEvent) state.currentEvent = null;
-    if (typeof state.practiceMode !== "boolean") state.practiceMode = false;
-    if (typeof state.practiceTheme !== "string") state.practiceTheme = "";
-    return true;
-  } catch {
-    return false;
-  }
+  try { Object.assign(state, JSON.parse(raw)); return true; } catch { return false; }
 }
 
-// ── ② 復習リスト管理 ──────────────────────────────
+// ── ② 復習リスト ──────────────────────────────────
 function getWrongAnswers() {
   try { return JSON.parse(localStorage.getItem(WRONG_KEY) || "[]"); } catch { return []; }
 }
 
-function getThemeStats() {
-  try { return JSON.parse(localStorage.getItem(STATS_KEY) || "{}"); } catch { return {}; }
-}
-
-function saveThemeStats(stats) {
-  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-}
-
-function recordThemeStat(theme, correct) {
-  if (!theme || state.reviewMode) return;
-  const stats = getThemeStats();
-  if (!stats[theme]) stats[theme] = { correct: 0, total: 0 };
-  stats[theme].total += 1;
-  if (correct) stats[theme].correct += 1;
-  saveThemeStats(stats);
-}
-
-function renderStats() {
-  const stats = getThemeStats();
-  const entries = Object.entries(stats).sort((a, b) => b[1].total - a[1].total);
-  if (entries.length === 0) {
-    el.statsContent.innerHTML = '<p class="stats-empty">まだ統計データがありません。</p>';
-    return;
-  }
-  el.statsContent.innerHTML = entries.map(([theme, v]) => {
-    const rate = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0;
-    return `<div class="stats-row">
-      <div class="stats-theme">${theme}</div>
-      <div class="stats-bar-bg"><div class="stats-bar-fill" style="width:${rate}%"></div></div>
-      <div class="stats-label">${v.correct}/${v.total} (${rate}%)</div>
-    </div>`;
-  }).join("");
-}
-
-function renderStageMap() {
-  const nodes = STAGES.map((s, idx) => {
-    let stateClass = "locked";
-    let status = "🔒";
-    if (state.cleared || idx < state.stageIndex) { stateClass = "cleared"; status = "✅"; }
-    else if (idx === state.stageIndex) { stateClass = "available"; status = "▶"; }
-    return `<div class="stage-node ${stateClass}">
-      <div class="stage-node-num">Stage ${idx + 1}</div>
-      <div class="stage-node-name">${s.name}</div>
-      <div class="stage-node-role">${s.role}</div>
-      <div class="stage-node-status">${status}</div>
-    </div>`;
-  }).join("");
-  el.stageMapGrid.innerHTML = nodes;
-}
-
-function renderThemePractice() {
-  const counts = {};
-  allQuestions.forEach((q) => { counts[q.theme] = (counts[q.theme] || 0) + 1; });
-  const themes = Object.keys(counts).sort();
-  el.themeGrid.innerHTML = themes.map((theme) =>
-    `<button class="theme-btn" data-theme="${theme}">${theme}<span class="theme-count">${counts[theme]}問</span></button>`
-  ).join("");
-  Array.from(el.themeGrid.querySelectorAll(".theme-btn")).forEach((btn) => {
-    btn.addEventListener("click", () => startThemePractice(btn.dataset.theme));
-  });
-}
-
-function togglePanel(targetSection) {
-  [el.rankingSection, el.stageMapSection, el.statsSection, el.themePracticeSection].forEach((section) => {
-    if (!section) return;
-    if (section === targetSection) section.classList.toggle("hidden");
-    else section.classList.add("hidden");
-  });
-}
-
-function closeAllPanels() {
-  [el.rankingSection, el.stageMapSection, el.statsSection, el.themePracticeSection].forEach((section) => {
-    if (section) section.classList.add("hidden");
-  });
-}
-
 function saveWrongAnswer(id) {
   const list = getWrongAnswers();
-  if (!list.includes(id)) {
-    list.push(id);
-    localStorage.setItem(WRONG_KEY, JSON.stringify(list));
-  }
+  if (!list.includes(id)) list.push(id);
+  localStorage.setItem(WRONG_KEY, JSON.stringify(list));
   updateReviewBtn();
 }
 
 function removeWrongAnswer(id) {
-  const list = getWrongAnswers().filter(x => x !== id);
-  localStorage.setItem(WRONG_KEY, JSON.stringify(list));
+  localStorage.setItem(WRONG_KEY, JSON.stringify(getWrongAnswers().filter(x => x !== id)));
   updateReviewBtn();
 }
 
@@ -350,7 +228,78 @@ function updateReviewBtn() {
   el.reviewBtn.classList.toggle("hidden", count === 0);
 }
 
+// ── ⑧ ステージ進捗 ────────────────────────────────
+function getProgress() {
+  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || '{"maxStageCleared":-1}'); }
+  catch { return { maxStageCleared: -1 }; }
+}
+
+function updateProgress(clearedStageIndex) {
+  const prog = getProgress();
+  if (clearedStageIndex > prog.maxStageCleared) {
+    prog.maxStageCleared = clearedStageIndex;
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(prog));
+  }
+}
+
+function renderStageMap() {
+  const { maxStageCleared } = getProgress();
+  el.stageMapGrid.innerHTML = STAGES.map((s, i) => {
+    let cls, status;
+    if (i <= maxStageCleared)            { cls = "cleared";   status = "✅ クリア済"; }
+    else if (i === maxStageCleared + 1)  { cls = "available"; status = "▶ 挑戦可能"; }
+    else                                 { cls = "locked";    status = "🔒"; }
+    return `
+      <div class="stage-node ${cls}">
+        <div class="stage-node-num">Stage ${i + 1}</div>
+        <div class="stage-node-name">${s.name}</div>
+        <div class="stage-node-role">${s.role}</div>
+        <div class="stage-node-status">${status}</div>
+      </div>`;
+  }).join("");
+}
+
+// ── ⑤ 正答率統計 ──────────────────────────────────
+function getStats() {
+  try { return JSON.parse(localStorage.getItem(STATS_KEY) || "{}"); } catch { return {}; }
+}
+
+function updateStats(theme, correct) {
+  const stats = getStats();
+  if (!stats[theme]) stats[theme] = { correct: 0, total: 0 };
+  stats[theme].total += 1;
+  if (correct) stats[theme].correct += 1;
+  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+}
+
+function renderStats() {
+  const stats   = getStats();
+  const entries = Object.entries(stats).sort((a, b) => b[1].total - a[1].total);
+  if (entries.length === 0) {
+    el.statsContent.innerHTML = '<p class="stats-empty">まだデータがありません。プレイすると蓄積されます。</p>';
+    return;
+  }
+  el.statsContent.innerHTML = entries.map(([theme, { correct, total }]) => {
+    const pct   = Math.round((correct / total) * 100);
+    const color = pct >= 80 ? "#22c55e" : pct >= 60 ? "#f59e0b" : "#ef4444";
+    return `
+      <div class="stats-row">
+        <div class="stats-theme">${theme}</div>
+        <div class="stats-bar-bg">
+          <div class="stats-bar-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="stats-label">${correct}/${total}問 (${pct}%)</div>
+      </div>`;
+  }).join("");
+}
+
 // ── UI更新 ────────────────────────────────────────
+function syncItemButtons() {
+  el.itemRoppoBtn.disabled  = state.items.roppo;
+  el.itemHanreiBtn.disabled = state.items.hanrei;
+  el.itemAIBtn.disabled     = state.items.ai;
+}
+
 function updateStatus() {
   const perRun = state.shuffledIndices.length || STAGES[state.stageIndex].questionsPerRun;
   el.sName.textContent     = state.name;
@@ -362,50 +311,31 @@ function updateStatus() {
   el.sStage.textContent    = state.reviewMode
     ? "復習モード"
     : `Stage ${state.stageIndex + 1}/${STAGES.length} ${STAGES[state.stageIndex].name}`;
-  if (el.achievementList) {
-    el.achievementList.textContent = state.achievements.length > 0
-      ? state.achievements.join(" / ")
-      : "未獲得";
-  }
+  el.sHint.textContent     = String(state.hints);
+  syncItemButtons();
 }
 
-function unlockAchievement(def) {
-  if (!def || state.achievementMap[def.key]) return "";
-  state.achievementMap[def.key] = true;
-  state.achievements.push(def.label);
-  return `\n🏅 実績解除: ${def.label}`;
-}
+// ── パネル切替 ────────────────────────────────────
+const panels = ["rankingSection", "stageMapSection", "statsSection"];
 
-function rollQuestionEvent() {
-  state.currentEvent = null;
-  currentTimerSec = TIMER_SEC;
-  if (state.reviewMode) {
-    el.eventInfo.classList.add("hidden");
-    el.eventInfo.textContent = "";
-    return;
-  }
-  if (Math.random() < 0.35) {
-    const picked = QUESTION_EVENTS[Math.floor(Math.random() * QUESTION_EVENTS.length)];
-    state.currentEvent = picked;
-    currentTimerSec = Math.max(10, TIMER_SEC + (picked.timerDelta || 0));
-    el.eventInfo.textContent = `🎲 ${picked.label}: ${picked.text}`;
-    el.eventInfo.classList.remove("hidden");
-  } else {
-    el.eventInfo.classList.add("hidden");
-    el.eventInfo.textContent = "";
-  }
+function showPanel(panelId) {
+  const target  = document.getElementById(panelId);
+  const wasHidden = target.classList.contains("hidden");
+  panels.forEach(id => document.getElementById(id).classList.add("hidden"));
+  if (wasHidden) target.classList.remove("hidden");
 }
 
 // ── 問題表示 ──────────────────────────────────────
 function showQuestion() {
   isAnswering = false;
-  rollQuestionEvent();
   const qs = getActiveQuestions();
   const q  = qs[state.shuffledIndices[state.current]];
 
   el.quizSection.classList.remove("hidden");
   el.resultSection.classList.add("hidden");
   el.shareBtn.classList.add("hidden");
+  el.hintText.classList.add("hidden");
+  el.hintText.textContent = "";
 
   if (!state.reviewMode && state.combo >= 2) {
     const mult = comboMultiplier(state.combo);
@@ -416,19 +346,23 @@ function showQuestion() {
   }
 
   el.fatalWarning.classList.toggle("hidden", !q.fatal || state.reviewMode);
-
-  const modeLabel = state.practiceMode ? " [練習]" : state.reviewMode ? " [復習]" : "";
-  el.questionText.textContent = `Q${state.current + 1}${modeLabel} [${q.theme}] ${q.text}`;
+  el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""} [${q.theme}] ${q.text}`;
   el.choices.innerHTML = "";
 
-  const choiceOrder = shuffle([...Array(q.choices.length).keys()]);
-  currentCorrectIdx = choiceOrder.indexOf(q.answer);
+  const choiceOrder    = shuffle([...Array(q.choices.length).keys()]);
+  currentCorrectIdx    = choiceOrder.indexOf(q.answer);
+  const removableWrong = shuffle(choiceOrder.filter(i => i !== q.answer))
+    .slice(0, Math.floor((q.choices.length - 1) / 2));
 
   choiceOrder.forEach((origIdx, displayIdx) => {
     const b = document.createElement("button");
-    b.className = "choice-btn";
+    b.className   = "choice-btn";
     b.textContent = `${displayIdx + 1}. ${q.choices[origIdx]}`;
     b.addEventListener("click", () => answerQuestion(displayIdx));
+    if (!state.reviewMode && state.items.hanrei && removableWrong.includes(origIdx)) {
+      b.disabled    = true;
+      b.textContent = `${displayIdx + 1}. ${q.choices[origIdx]}（判例DBで除外）`;
+    }
     el.choices.appendChild(b);
   });
 
@@ -442,26 +376,18 @@ function answerQuestion(selected) {
   isAnswering = true;
   clearTimer();
 
-  const q = getActiveQuestions()[state.shuffledIndices[state.current]];
-  const event = state.currentEvent || { expRate: 1.0, damageReduction: 0 };
+  const q       = getActiveQuestions()[state.shuffledIndices[state.current]];
   const correct = selected === currentCorrectIdx;
-
-  // ① ボタンをハイライト → 700ms後に結果表示
   highlightChoices(selected);
-
+  updateStats(q.theme, correct);
   state.stageTotal += 1;
   let msg = "";
 
   if (state.reviewMode) {
-    // ② 復習モード：HP/EXP変動なし
     if (correct) {
       state.reviewCorrect += 1;
-      if (state.practiceMode) {
-        msg += "✅ 正解！\n";
-      } else {
-        removeWrongAnswer(q.id);
-        msg += "✅ 正解！ 復習リストから削除しました\n";
-      }
+      removeWrongAnswer(q.id);
+      msg += "✅ 正解！ 復習リストから削除しました\n";
     } else {
       msg += "❌ 不正解\n";
       msg += `正解: ${q.choices[q.answer]}\n`;
@@ -472,35 +398,31 @@ function answerQuestion(selected) {
     return;
   }
 
-  // 通常モード
-  recordThemeStat(q.theme, correct);
   if (correct) {
     state.combo += 1;
     const mult    = comboMultiplier(state.combo);
     const speed   = speedBonus(timerRemaining);
     const baseExp = EXP_PER_STAGE[state.stageIndex] ?? 10;
-    const gained  = Math.floor(baseExp * mult * (event.expRate || 1.0));
+    const gained  = Math.floor(baseExp * mult);
     const bonus   = Math.floor(baseExp * speed);
-    state.exp += gained + bonus;
+    state.exp    += gained + bonus;
     state.stageCorrect += 1;
     msg += `✅ 正解！ EXP +${gained}`;
     if (state.combo >= 2) msg += ` 🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`;
-    if (bonus > 0) msg += ` ⚡ 速答ボーナス +${bonus}`;
+    if (bonus > 0)        msg += ` ⚡ 速答ボーナス +${bonus}`;
     msg += "\n";
-    if (q.fatal) msg += unlockAchievement(ACHIEVEMENTS.fatalClear);
-    if (state.combo >= 3) msg += unlockAchievement(ACHIEVEMENTS.combo3);
     while (state.exp >= state.lv * 50) {
       state.lv += 1;
       msg += `⬆️ レベルアップ！ LV${state.lv}\n`;
     }
   } else {
     state.combo = 0;
-    saveWrongAnswer(q.id); // ② 間違えた問題を記録
+    saveWrongAnswer(q.id);
     if (q.fatal) {
       state.hp = 0;
       msg += `💀 致命的ミス！ HP全消滅！\n`;
     } else {
-      const damage = Math.max(1, 20 - (event.damageReduction || 0));
+      const damage = state.items.ai ? 10 : 20;
       state.hp = Math.max(0, state.hp - damage);
       msg += `❌ 不正解… HP -${damage}\n`;
     }
@@ -516,39 +438,29 @@ function answerQuestion(selected) {
 function handleAfterAnswer(msg, correct) {
   const perRun = state.shuffledIndices.length;
 
-  // ② 復習モード終了判定
   if (state.reviewMode) {
     if (state.current >= perRun) {
-      const total = perRun;
-      if (state.practiceMode) {
-        msg += `\n\n🎯 テーマ練習完了！ ${state.reviewCorrect}/${total}問 正解`;
-      } else {
-        msg += `\n\n📚 復習完了！ ${state.reviewCorrect}/${total}問 正解`;
-        msg += `\n正解した問題は復習リストから削除されました。`;
-      }
+      msg += `\n\n📚 復習完了！ ${state.reviewCorrect}/${perRun}問 正解`;
+      msg += "\n正解した問題は復習リストから削除されました。";
       el.nextBtn.classList.add("hidden");
       el.restartBtn.classList.remove("hidden");
-      el.shareBtn.classList.add("hidden");
+      setShareText(buildShareTextReview(state.reviewCorrect, perRun));
     } else {
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
       el.shareBtn.classList.add("hidden");
     }
-    updateStatus();
-    el.quizSection.classList.add("hidden");
-    el.resultSection.classList.remove("hidden");
-    el.resultText.textContent = msg;
     el.scoreBanner.classList.add("hidden");
+    finishResult(msg);
     return;
   }
 
-  // 通常モード
   if (state.hp <= 0) {
     state.gameOver = true;
     const score = calcScore();
     state.totalScore = score;
     saveRanking(state.name, score, "ゲームオーバー");
-    msg += `\n\nゲームオーバー。法務リスク管理の見直しが必要です。\nスコア: ${score}`;
+    msg += `\n\nゲームオーバー。\nスコア: ${score}`;
     el.nextBtn.classList.add("hidden");
     el.restartBtn.classList.remove("hidden");
     setShareText(buildShareTextGameOver(score));
@@ -557,29 +469,29 @@ function handleAfterAnswer(msg, correct) {
     const grade = calcGrade(state.stageCorrect, state.stageTotal, state.hp, state.stageStartHp);
 
     if (state.stageIndex < STAGES.length - 1) {
-      const clearedNum = state.stageIndex + 1;
+      const clearedIdx = state.stageIndex;
       const nextRole   = STAGES[state.stageIndex + 1].role;
-      showStageClearOverlay(clearedNum, nextRole, grade.label, false);
+      updateProgress(clearedIdx);
+      showStageClearOverlay(clearedIdx + 1, nextRole, grade.label, false);
       msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n次のステージ: ${STAGES[state.stageIndex + 1].name}`;
-      msg += `\n新役職: ${nextRole}`;
-      if (state.hp >= state.stageStartHp) {
-        msg += unlockAchievement(ACHIEVEMENTS.noDamageStage);
-      }
+      msg += `\n新役職: ${nextRole} / ヒント +1 獲得`;
+      setShareText(buildShareTextStageClear(clearedIdx + 1, grade.label, state.stageCorrect, state.stageTotal));
 
       state.stageIndex += 1;
       state.current = 0;
-      state.combo = 0;
+      state.hints  += 1;
+      state.combo   = 0;
       state.stageCorrect = 0;
-      state.stageTotal = 0;
+      state.stageTotal   = 0;
       state.stageStartHp = state.hp;
       buildShuffledIndices();
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
-      el.shareBtn.classList.add("hidden");
 
     } else {
+      updateProgress(state.stageIndex);
       state.cleared = true;
       const score = calcScore();
       state.totalScore = score;
@@ -599,11 +511,6 @@ function handleAfterAnswer(msg, correct) {
     el.shareBtn.classList.add("hidden");
   }
 
-  updateStatus();
-  el.quizSection.classList.add("hidden");
-  el.resultSection.classList.remove("hidden");
-  el.resultText.textContent = msg;
-
   if (state.gameOver || state.cleared) {
     el.scoreBanner.classList.remove("hidden");
     el.scoreBanner.classList.toggle("gameover", state.gameOver);
@@ -613,17 +520,25 @@ function handleAfterAnswer(msg, correct) {
     el.scoreBanner.classList.add("hidden");
   }
 
+  finishResult(msg);
   saveState();
 }
 
-// ── ③ シェア機能 ──────────────────────────────────
+function finishResult(msg) {
+  updateStatus();
+  el.quizSection.classList.add("hidden");
+  el.resultSection.classList.remove("hidden");
+  el.resultText.textContent = msg;
+}
+
+// ── ③ シェア ──────────────────────────────────────
 function setShareText(text) {
   el.shareBtn.classList.remove("hidden");
   el.shareBtn.dataset.text = text;
 }
 
 function buildShareTextStageClear(stageNum, grade, correct, total) {
-  return `🎮 法務RPG\nStage ${stageNum}「${STAGES[stageNum - 1].name}」クリア！\n評価: ${grade} / 正答率: ${correct}/${total}\n役職: ${STAGES[stageNum].role}\n#法務RPG`;
+  return `🎮 法務RPG\nStage ${stageNum}「${STAGES[stageNum - 1].name}」クリア！\n評価: ${grade} / 正答率: ${correct}/${total}\n役職: ${STAGES[Math.min(stageNum, STAGES.length - 1)].role}\n#法務RPG`;
 }
 
 function buildShareTextFullClear(grade, score) {
@@ -635,7 +550,7 @@ function buildShareTextGameOver(score) {
 }
 
 function buildShareTextReview(correct, total) {
-  return `📚 法務RPG 復習モード\n${correct}/${total}問 正解！\n#法務RPG`;
+  return `📚 法務RPG 復習モード\n${correct}/${total}問 正解！ #法務RPG`;
 }
 
 // ── ステージクリア演出 ─────────────────────────────
@@ -683,76 +598,70 @@ function renderRanking() {
   ).join("");
 }
 
-// ── ゲーム開始 ─────────────────────────────────────
+// ── ヒント・アイテム ───────────────────────────────
+function showHint() {
+  if (state.hints <= 0) { alert("ヒント残数がありません。"); return; }
+  const q = getActiveQuestions()[state.shuffledIndices[state.current]];
+  state.hints -= 1;
+  el.hintText.textContent = `ヒント: ${q.hint || "法令の趣旨と原則を確認しましょう。"}`;
+  el.hintText.classList.remove("hidden");
+  updateStatus();
+  saveState();
+}
+
+function useItem(type) {
+  if (state.items[type]) return;
+  const msgs = {
+    roppo:  "六法を装備しました。ヒント残数 +1。",
+    hanrei: "判例DBを装備しました。問題ごとに一部選択肢を除外します。",
+    ai:     "生成AIアシストを装備しました。不正解時のHP減少が軽減されます。",
+  };
+  state.items[type] = true;
+  if (type === "roppo") state.hints += 1;
+  el.itemInfo.textContent = msgs[type];
+  updateStatus();
+  saveState();
+}
+
+// ── ゲーム開始・終了 ───────────────────────────────
 function startGame() {
   const name = el.playerName.value.trim();
   if (!name) { alert("プレイヤー名を入力してください。"); return; }
   Object.assign(state, {
     name, hp: 100, exp: 0, lv: 1,
-    stageIndex: 0, current: 0,
+    stageIndex: 0, current: 0, hints: 1,
+    items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
-    achievements: [],
-    achievementMap: {},
-    currentEvent: null,
     shuffledIndices: [],
     stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
     reviewMode: false, reviewPool: [], reviewCorrect: 0,
-    practiceMode: false, practiceTheme: "",
   });
   buildShuffledIndices();
   showGameUI();
   saveState();
 }
 
-// ② 復習モード開始
 function startReviewMode() {
   const wrongIds = getWrongAnswers();
   if (wrongIds.length === 0) { alert("復習する問題がありません。"); return; }
   const pool = allQuestions.filter(q => wrongIds.includes(q.id));
   if (pool.length === 0) { alert("問題データが見つかりません。"); return; }
-
   const name = el.playerName.value.trim() || "プレイヤー";
   Object.assign(state, {
-    name,
-    reviewMode: true,
-    practiceMode: false,
-    practiceTheme: "",
-    reviewPool: pool,
-    reviewCorrect: 0,
-    current: 0,
-    shuffledIndices: [],
+    name, reviewMode: true, reviewPool: pool, reviewCorrect: 0,
+    current: 0, hints: 1, shuffledIndices: [],
+    items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
-    currentEvent: null,
-  });
-  buildShuffledIndices();
-  showGameUI();
-}
-
-function startThemePractice(theme) {
-  const pool = ensureMinimumQuestions(allQuestions.filter(q => q.theme === theme), 5);
-  if (pool.length === 0) { alert("このテーマの問題が見つかりません。"); return; }
-
-  const name = el.playerName.value.trim() || "プレイヤー";
-  Object.assign(state, {
-    name,
-    reviewMode: true,
-    practiceMode: true,
-    practiceTheme: theme,
-    reviewPool: pool,
-    reviewCorrect: 0,
-    current: 0,
-    shuffledIndices: [],
-    gameOver: false, cleared: false, combo: 0,
-    currentEvent: null,
   });
   buildShuffledIndices();
   showGameUI();
 }
 
 function showGameUI() {
-  closeAllPanels();
   el.startSection.classList.add("hidden");
+  panels.forEach(id => document.getElementById(id).classList.add("hidden"));
   el.statusSection.classList.remove("hidden");
+  el.itemSection.classList.remove("hidden");
   updateStatus();
   showQuestion();
 }
@@ -762,7 +671,7 @@ function restartGame() {
   localStorage.removeItem(SAVE_KEY);
   el.playerName.value = "";
   el.startSection.classList.remove("hidden");
-  ["statusSection","quizSection","resultSection"].forEach(id =>
+  ["statusSection","itemSection","quizSection","resultSection"].forEach(id =>
     document.getElementById(id).classList.add("hidden")
   );
   updateReviewBtn();
@@ -777,6 +686,7 @@ function resumeOrShowStart() {
   el.playerName.value = state.name;
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
+  el.itemSection.classList.remove("hidden");
   updateStatus();
   const perRun = state.shuffledIndices.length;
   if (state.current < perRun && !state.gameOver && !state.cleared) {
@@ -794,56 +704,35 @@ el.startBtn.addEventListener("click", startGame);
 el.playerName.addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
 el.nextBtn.addEventListener("click", showQuestion);
 el.restartBtn.addEventListener("click", restartGame);
+el.hintBtn.addEventListener("click", showHint);
+el.itemRoppoBtn.addEventListener("click", () => useItem("roppo"));
+el.itemHanreiBtn.addEventListener("click", () => useItem("hanrei"));
+el.itemAIBtn.addEventListener("click", () => useItem("ai"));
 el.reviewBtn.addEventListener("click", startReviewMode);
 
-// ③ コピーボタン
+el.showRankingBtn.addEventListener("click", () => { renderRanking(); showPanel("rankingSection"); });
+el.clearRankingBtn.addEventListener("click", () => {
+  if (confirm("ランキングを全件削除しますか？")) { localStorage.removeItem(RANKING_KEY); renderRanking(); }
+});
+
+el.stageMapBtn.addEventListener("click", () => { renderStageMap(); showPanel("stageMapSection"); });
+
+el.statsBtn.addEventListener("click", () => { renderStats(); showPanel("statsSection"); });
+el.clearStatsBtn.addEventListener("click", () => {
+  if (confirm("統計データをリセットしますか？")) { localStorage.removeItem(STATS_KEY); renderStats(); }
+});
+
+document.querySelectorAll("[data-close-panel]").forEach(btn => {
+  btn.addEventListener("click", () => panels.forEach(id => document.getElementById(id).classList.add("hidden")));
+});
+
 el.shareBtn.addEventListener("click", () => {
   const text = el.shareBtn.dataset.text || "";
   navigator.clipboard.writeText(text).then(() => {
     el.shareBtn.textContent = "✅ コピーしました！";
     el.shareBtn.classList.add("copied");
-    setTimeout(() => {
-      el.shareBtn.textContent = "📋 結果をコピー";
-      el.shareBtn.classList.remove("copied");
-    }, 2000);
-  }).catch(() => {
-    prompt("以下のテキストをコピーしてください：", text);
-  });
-});
-
-el.showRankingBtn.addEventListener("click", () => {
-  renderRanking();
-  togglePanel(el.rankingSection);
-});
-el.stageMapBtn.addEventListener("click", () => {
-  renderStageMap();
-  togglePanel(el.stageMapSection);
-});
-el.statsBtn.addEventListener("click", () => {
-  renderStats();
-  togglePanel(el.statsSection);
-});
-el.themeBtn.addEventListener("click", () => {
-  renderThemePractice();
-  togglePanel(el.themePracticeSection);
-});
-el.clearRankingBtn.addEventListener("click", () => {
-  if (confirm("ランキングを全件削除しますか？")) {
-    localStorage.removeItem(RANKING_KEY);
-    renderRanking();
-  }
-});
-el.clearStatsBtn.addEventListener("click", () => {
-  if (confirm("正答率統計をリセットしますか？")) {
-    localStorage.removeItem(STATS_KEY);
-    renderStats();
-  }
-});
-Array.from(document.querySelectorAll("[data-close-panel]")).forEach((btn) => {
-  btn.addEventListener("click", () => {
-    closeAllPanels();
-    el.startSection.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+    setTimeout(() => { el.shareBtn.textContent = "📋 結果をコピー"; el.shareBtn.classList.remove("copied"); }, 2000);
+  }).catch(() => { prompt("以下のテキストをコピーしてください：", text); });
 });
 
 // ── データ読み込み ─────────────────────────────────
@@ -851,9 +740,6 @@ fetch("questions.json")
   .then(r => r.json())
   .then(questions => {
     allQuestions = questions;
-    renderStageMap();
-    renderStats();
-    renderThemePractice();
     resumeOrShowStart();
   })
   .catch(() => {
