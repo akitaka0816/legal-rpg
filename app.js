@@ -424,11 +424,11 @@ function handleAfterAnswer(msg, correct) {
       msg += `\n正解した問題は復習リストから削除されました。`;
       el.nextBtn.classList.add("hidden");
       el.restartBtn.classList.remove("hidden");
-      // ③ シェア
-      setShareText(buildShareTextReview(state.reviewCorrect, total));
+      el.shareBtn.classList.add("hidden");
     } else {
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
+      el.shareBtn.classList.add("hidden");
     }
     updateStatus();
     el.quizSection.classList.add("hidden");
@@ -474,8 +474,7 @@ function handleAfterAnswer(msg, correct) {
       buildShuffledIndices();
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
-      // ③ ステージクリアのシェアテキスト
-      setShareText(buildShareTextStageClear(clearedNum, grade.label, state.stageCorrect, state.stageTotal));
+      el.shareBtn.classList.add("hidden");
 
     } else {
       state.cleared = true;
