@@ -20,6 +20,9 @@
   --font-h2: clamp(1.02rem, 1.6vw, 1.2rem);
   --font-body: 0.98rem;
   --font-small: 0.86rem;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --ring: 0 0 0 3px rgba(56, 189, 248, 0.25);
 }
 
 html {
@@ -57,7 +60,7 @@ h1 {
 .card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 14px;
+  border-radius: var(--radius);
   padding: 18px;
   margin-top: 14px;
   box-shadow: var(--card-shadow);
@@ -124,7 +127,7 @@ input {
   width: 100%;
   margin: 8px 0 12px;
   padding: 11px 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid #475569;
   background: #0b1220cc;
   color: var(--text-strong);
@@ -134,13 +137,13 @@ input {
 input:focus {
   outline: none;
   border-color: #38bdf8;
-  box-shadow: 0 0 0 3px #0ea5e940;
+  box-shadow: var(--ring);
 }
 
 button {
   padding: 10px 14px;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   background: var(--primary);
   color: #ffffff;
   cursor: pointer;
@@ -150,6 +153,11 @@ button {
   font-weight: 600;
   letter-spacing: 0.01em;
   transition: transform 0.14s ease, background 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
 }
 
 button:active {
@@ -172,7 +180,9 @@ button:hover {
   width: 100%;
   text-align: left;
   margin-bottom: 8px;
-  background: linear-gradient(180deg, #1d4ed8, #1e40af);
+  background: linear-gradient(180deg, #2b6aff, #1e40af);
+  color: #fff;
+  font-weight: 600;
 }
 
 .choice-btn:hover {
@@ -202,7 +212,7 @@ button:hover {
 .timer-bar {
   height: 100%;
   width: 100%;
-  background: #22c55e;
+  background: var(--accent-success);
   border-radius: 6px;
   transition: width 1s linear, background 0.3s;
 }
@@ -456,10 +466,15 @@ button:hover {
 
 .btn-secondary:hover {
   background: #475569;
+  box-shadow: 0 8px 18px rgba(51, 65, 85, 0.35);
 }
 
 .panel-close-btn {
-  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  margin-top: 10px;
 }
 
 .btn-danger {
@@ -469,6 +484,7 @@ button:hover {
 
 .btn-danger:hover {
   background: #991b1b;
+  box-shadow: 0 8px 18px rgba(239, 68, 68, 0.22);
 }
 
 /* スタートボタン群 */
@@ -495,7 +511,7 @@ button:hover {
 /* ⑧ ステージマップ */
 .stage-map-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-top: 8px;
 }
@@ -592,8 +608,8 @@ button:hover {
 
 /* ④ テーマ別練習 */
 .theme-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 10px;
 }
 
@@ -607,6 +623,8 @@ button:hover {
   font-size: 0.88rem;
   transition: background 0.15s, border-color 0.15s;
   margin: 0;
+  width: 100%;
+  text-align: left;
 }
 
 .theme-btn:hover {
@@ -622,29 +640,6 @@ button:hover {
 
 .hidden {
   display: none;
-}
-
-/* ── サウンドトグルボタン ── */
-.sound-toggle-btn {
-  position: fixed;
-  top: 0.7rem;
-  right: 0.8rem;
-  z-index: 1000;
-  background: rgba(37, 99, 235, 0.75);
-  border: 1px solid rgba(125, 150, 186, 0.5);
-  border-radius: 50%;
-  width: 2.4rem;
-  height: 2.4rem;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}
-.sound-toggle-btn:hover {
-  background: rgba(29, 78, 216, 0.9);
 }
 
 #resultText {
