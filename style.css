@@ -622,6 +622,29 @@ button:hover {
   display: none;
 }
 
+/* ── サウンドトグルボタン ── */
+.sound-toggle-btn {
+  position: fixed;
+  top: 0.7rem;
+  right: 0.8rem;
+  z-index: 1000;
+  background: rgba(37, 99, 235, 0.75);
+  border: 1px solid rgba(125, 150, 186, 0.5);
+  border-radius: 50%;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.sound-toggle-btn:hover {
+  background: rgba(29, 78, 216, 0.9);
+}
+
 #resultText {
   white-space: pre-line;
 }

@@ -129,6 +129,7 @@ function updateTimerDisplay() {
 function timeUp() {
   if (isAnswering) return;
   isAnswering = true;
+  SoundEngine.playTimeUp();
   const q = getActiveQuestions()[state.shuffledIndices[state.current]];
   highlightChoices(-1);
   state.stageTotal += 1;
@@ -346,6 +347,7 @@ function showQuestion() {
   }
 
   el.fatalWarning.classList.toggle("hidden", !q.fatal || state.reviewMode);
+  if (q.fatal && !state.reviewMode) setTimeout(() => SoundEngine.playFatalWarning(), 300);
   el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""} [${q.theme}] ${q.text}`;
   el.choices.innerHTML = "";
 
@@ -383,6 +385,9 @@ function answerQuestion(selected) {
   state.stageTotal += 1;
   let msg = "";
 
+  if (correct) SoundEngine.playCorrect();
+  else SoundEngine.playWrong();
+
   if (state.reviewMode) {
     if (correct) {
       state.reviewCorrect += 1;
@@ -408,7 +413,7 @@ function answerQuestion(selected) {
     state.exp    += gained + bonus;
     state.stageCorrect += 1;
     msg += `✅ 正解！ EXP +${gained}`;
-    if (state.combo >= 2) msg += ` 🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`;
+    if (state.combo >= 2) { msg += ` 🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`; setTimeout(() => SoundEngine.playCombo(state.combo), 160); }
     if (bonus > 0)        msg += ` ⚡ 速答ボーナス +${bonus}`;
     msg += "\n";
     while (state.exp >= state.lv * 50) {
@@ -460,6 +465,8 @@ function handleAfterAnswer(msg, correct) {
     const score = calcScore();
     state.totalScore = score;
     saveRanking(state.name, score, "ゲームオーバー");
+    SoundEngine.stopBgm();
+    setTimeout(() => SoundEngine.playGameOver(), 200);
     msg += `\n\nゲームオーバー。\nスコア: ${score}`;
     el.nextBtn.classList.add("hidden");
     el.restartBtn.classList.remove("hidden");
@@ -472,6 +479,7 @@ function handleAfterAnswer(msg, correct) {
       const clearedIdx = state.stageIndex;
       const nextRole   = STAGES[state.stageIndex + 1].role;
       updateProgress(clearedIdx);
+      SoundEngine.playStageClear();
       showStageClearOverlay(clearedIdx + 1, nextRole, grade.label, false);
       msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
@@ -496,6 +504,8 @@ function handleAfterAnswer(msg, correct) {
       const score = calcScore();
       state.totalScore = score;
       saveRanking(state.name, score, grade.label);
+      SoundEngine.stopBgm();
+      SoundEngine.playFullClear();
       showStageClearOverlay(STAGES.length, CLEARED_ROLE, grade.label, true);
       msg += `\n\n法務責任者に就任しました！`;
       msg += `\n評価: ${grade.label}（${grade.reason}）`;
@@ -663,11 +673,13 @@ function showGameUI() {
   el.statusSection.classList.remove("hidden");
   el.itemSection.classList.remove("hidden");
   updateStatus();
+  SoundEngine.startBgm();
   showQuestion();
 }
 
 function restartGame() {
   clearTimer();
+  SoundEngine.stopBgm();
   localStorage.removeItem(SAVE_KEY);
   el.playerName.value = "";
   el.startSection.classList.remove("hidden");
@@ -724,6 +736,11 @@ el.clearStatsBtn.addEventListener("click", () => {
 
 document.querySelectorAll("[data-close-panel]").forEach(btn => {
   btn.addEventListener("click", () => panels.forEach(id => document.getElementById(id).classList.add("hidden")));
+});
+
+document.getElementById("soundToggleBtn").addEventListener("click", () => {
+  const muted = SoundEngine.toggleMute();
+  document.getElementById("soundToggleBtn").textContent = muted ? "🔇" : "🔊";
 });
 
 el.shareBtn.addEventListener("click", () => {
