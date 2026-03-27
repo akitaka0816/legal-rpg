@@ -46,6 +46,8 @@ const SoundEngine = window.SoundEngine || {
   playFullClear() {},
 };
 
+let questionsReady = false;
+
 const state = {
   name: "", hp: 100, exp: 0, lv: 1,
   stageIndex: 0, current: 0, hints: 1,
@@ -109,6 +111,13 @@ const el = {
   stageClearRole:    document.getElementById("stageClearRole"),
   stageClearGrade:   document.getElementById("stageClearGrade"),
 };
+
+// 初期状態は問題読み込み待ち
+if (el.startBtn) {
+  el.startBtn.disabled = true;
+  el.startBtn.dataset.readyLabel = el.startBtn.textContent || "▶ 開始";
+  el.startBtn.textContent = "⏳ 読み込み中...";
+}
 
 // ── タイマー ──────────────────────────────────────
 let timerInterval   = null;
@@ -325,7 +334,7 @@ function updateStatus() {
   el.sStage.textContent    = state.reviewMode
     ? "復習モード"
     : `Stage ${state.stageIndex + 1}/${STAGES.length} ${STAGES[state.stageIndex].name}`;
-  el.sHint.textContent     = String(state.hints);
+  if (el.sHint) el.sHint.textContent = String(state.hints);
   syncItemButtons();
 }
 
@@ -648,8 +657,8 @@ function useItem(type) {
 
 // ── ゲーム開始・終了 ───────────────────────────────
 function startGame() {
-  if (!allQuestions || allQuestions.length === 0) {
-    alert("問題を読み込み中です。少し待ってから開始してください。");
+  if (!questionsReady || !allQuestions || allQuestions.length === 0) {
+    alert("問題を読み込み中です。数秒待ってからもう一度開始してください。");
     return;
   }
   const name = el.playerName.value.trim();
@@ -778,9 +787,18 @@ fetch("questions.json")
   .then(r => r.json())
   .then(questions => {
     allQuestions = questions;
+    questionsReady = true;
+    if (el.startBtn) {
+      el.startBtn.disabled = false;
+      el.startBtn.textContent = el.startBtn.dataset.readyLabel || "▶ 開始";
+    }
     resumeOrShowStart();
   })
   .catch(() => {
+    if (el.startBtn) {
+      el.startBtn.disabled = true;
+      el.startBtn.textContent = "⚠ 読み込み失敗";
+    }
     document.body.innerHTML =
       "<p style='color:#f87171;padding:2rem;font-family:sans-serif'>" +
       "questions.json の読み込みに失敗しました。<br>" +
