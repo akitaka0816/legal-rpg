@@ -471,7 +471,7 @@ function handleAfterAnswer(msg, correct) {
       msg += "\n正解した問題は復習リストから削除されました。";
       el.nextBtn.classList.add("hidden");
       el.restartBtn.classList.remove("hidden");
-      setShareText(buildShareTextReview(state.reviewCorrect, perRun));
+      el.shareBtn.classList.add("hidden");
     } else {
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
@@ -507,7 +507,7 @@ function handleAfterAnswer(msg, correct) {
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n次のステージ: ${STAGES[state.stageIndex + 1].name}`;
       msg += `\n新役職: ${nextRole} / ヒント +1 獲得`;
-      setShareText(buildShareTextStageClear(clearedIdx + 1, grade.label, state.stageCorrect, state.stageTotal));
+      el.shareBtn.classList.add("hidden");
 
       state.stageIndex += 1;
       state.current = 0;
