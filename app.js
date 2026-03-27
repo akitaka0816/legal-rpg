@@ -53,6 +53,7 @@ const state = {
   stageIndex: 0, current: 0, hints: 1,
   items: { roppo: false, hanrei: false, ai: false },
   gameOver: false, cleared: false, combo: 0,
+  stageIntroPending: false,
   shuffledIndices: [],
   stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
   reviewMode: false, reviewPool: [], reviewCorrect: 0,
@@ -350,12 +351,29 @@ function showPanel(panelId) {
 
 // ── 問題表示 ──────────────────────────────────────
 function showQuestion() {
+  if (!state.reviewMode && state.stageIntroPending) {
+    const stage = STAGES[state.stageIndex];
+    el.quizSection.classList.add("hidden");
+    el.resultSection.classList.remove("hidden");
+    el.resultText.textContent =
+      `📣 Stage ${state.stageIndex + 1} 開始\n` +
+      `${stage.name}\n` +
+      `役職: ${stage.role}\n` +
+      `このステージは ${stage.questionsPerRun} 問です。`;
+    el.nextBtn.textContent = "このステージを開始";
+    el.nextBtn.classList.remove("hidden");
+    el.restartBtn.classList.add("hidden");
+    el.shareBtn.classList.add("hidden");
+    return;
+  }
+
   isAnswering = false;
   const qs = getActiveQuestions();
   const q  = qs[state.shuffledIndices[state.current]];
 
   el.quizSection.classList.remove("hidden");
   el.resultSection.classList.add("hidden");
+  el.nextBtn.textContent = "次へ";
   el.shareBtn.classList.add("hidden");
   el.hintText.classList.add("hidden");
   el.hintText.textContent = "";
@@ -516,7 +534,9 @@ function handleAfterAnswer(msg, correct) {
       state.stageCorrect = 0;
       state.stageTotal   = 0;
       state.stageStartHp = state.hp;
+      state.stageIntroPending = true;
       buildShuffledIndices();
+      el.nextBtn.textContent = "次のステージを開始";
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
 
@@ -668,6 +688,7 @@ function startGame() {
     stageIndex: 0, current: 0, hints: 1,
     items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
+    stageIntroPending: true,
     shuffledIndices: [],
     stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
     reviewMode: false, reviewPool: [], reviewCorrect: 0,
@@ -687,7 +708,7 @@ function startReviewMode() {
     name, reviewMode: true, reviewPool: pool, reviewCorrect: 0,
     current: 0, hints: 1, shuffledIndices: [],
     items: { roppo: false, hanrei: false, ai: false },
-    gameOver: false, cleared: false, combo: 0,
+    gameOver: false, cleared: false, combo: 0, stageIntroPending: false,
   });
   buildShuffledIndices();
   showGameUI();
@@ -739,7 +760,10 @@ function resumeOrShowStart() {
 // ── イベント ──────────────────────────────────────
 el.startBtn.addEventListener("click", startGame);
 el.playerName.addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
-el.nextBtn.addEventListener("click", showQuestion);
+el.nextBtn.addEventListener("click", () => {
+  if (!state.reviewMode && state.stageIntroPending) state.stageIntroPending = false;
+  showQuestion();
+});
 el.restartBtn.addEventListener("click", restartGame);
 el.hintBtn.addEventListener("click", showHint);
 if (el.itemRoppoBtn) el.itemRoppoBtn.addEventListener("click", () => useItem("roppo"));
