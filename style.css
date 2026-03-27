@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Yu Gothic UI", sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.container {
+  max-width: 820px;
+  margin: 24px auto;
+  padding: 0 16px 40px;
+}
+
+h1 {
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin-top: 0;
+}
+
+.card {
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 14px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.quiz-actions {
+  margin-bottom: 8px;
+}
+
+.hint-text {
+  background: #1f2937;
+  border-left: 3px solid #38bdf8;
+  padding: 10px;
+  border-radius: 6px;
+  color: #bae6fd;
+}
+
+#itemInfo {
+  margin-top: 10px;
+  color: #cbd5e1;
+}
+
+input {
+  width: 100%;
+  margin: 8px 0 12px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #475569;
+  background: #0b1220;
+  color: #e2e8f0;
+}
+
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  cursor: pointer;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+.choice-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.hidden {
+  display: none;
+}
