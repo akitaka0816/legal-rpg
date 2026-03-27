@@ -15,9 +15,36 @@
         <h2>ゲーム開始</h2>
         <label for="playerName">プレイヤー名</label>
         <input id="playerName" type="text" placeholder="名前を入力" />
-        <button id="startBtn">開始</button>
-        <button id="showRankingBtn" class="btn-secondary">ランキング</button>
-        <button id="reviewBtn" class="btn-review hidden">復習モード <span id="reviewCount" class="review-count">0</span>問</button>
+        <div class="start-buttons">
+          <button id="startBtn">▶ 開始</button>
+          <button id="showRankingBtn" class="btn-secondary">🏆 ランキング</button>
+          <button id="reviewBtn" class="btn-review hidden">📖 復習 <span id="reviewCount" class="review-count">0</span>問</button>
+        </div>
+        <div class="start-buttons-sub">
+          <button id="stageMapBtn" class="btn-secondary">📍 ステージマップ</button>
+          <button id="statsBtn" class="btn-secondary">📊 正答率統計</button>
+          <button id="themeBtn" class="btn-secondary">🎯 テーマ練習</button>
+        </div>
+      </section>
+
+      <!-- ⑧ ステージマップ -->
+      <section class="card hidden" id="stageMapSection">
+        <h2>📍 ステージマップ</h2>
+        <div id="stageMapGrid" class="stage-map-grid"></div>
+      </section>
+
+      <!-- ⑤ 正答率統計 -->
+      <section class="card hidden" id="statsSection">
+        <h2>📊 正答率統計（テーマ別）</h2>
+        <div id="statsContent"></div>
+        <button id="clearStatsBtn" class="btn-danger">統計をリセット</button>
+      </section>
+
+      <!-- ④ テーマ別練習 -->
+      <section class="card hidden" id="themePracticeSection">
+        <h2>🎯 テーマ別練習</h2>
+        <p class="subtitle" style="margin:0 0 12px">HP/EXP変動なしの練習モードです</p>
+        <div id="themeGrid" class="theme-grid"></div>
       </section>
 
       <section class="card hidden" id="rankingSection">
@@ -34,9 +61,13 @@
           <div>LV: <span id="sLv">1</span></div>
           <div>HP: <span id="sHp">100</span></div>
           <div>EXP: <span id="sExp">0</span></div>
-          <div>進行: <span id="sProgress">0/3</span></div>
-          <div>ステージ: <span id="sStage">初級</span></div>
+          <div>進行: <span id="sProgress">0/5</span></div>
+          <div>ステージ: <span id="sStage">-</span></div>
           <div>ヒント残数: <span id="sHint">0</span></div>
+        </div>
+        <div class="achievement-wrap">
+          <div class="achievement-title">実績</div>
+          <div id="achievementList" class="achievement-list">未獲得</div>
         </div>
       </section>
 
@@ -67,6 +98,7 @@
           <button id="hintBtn">ヒントを見る</button>
         </div>
         <p id="hintText" class="hint-text hidden"></p>
+        <p id="eventInfo" class="event-info hidden"></p>
         <div id="choices"></div>
       </section>
 

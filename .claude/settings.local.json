@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const q = require\\(''./questions.json''\\); const counts = {}; q.forEach\\(x => { counts[x.difficulty] = \\(counts[x.difficulty]||0\\)+1; }\\); console.log\\(''total:'', q.length\\); console.log\\(''by difficulty:'', counts\\);\")",
+      "Bash(python -c \"import json; q=json.load\\(open\\(''questions.json'',encoding=''utf-8''\\)\\); counts={}; [counts.update\\({x[''difficulty'']: counts.get\\(x[''difficulty''],0\\)+1}\\) for x in q]; print\\(''total:'', len\\(q\\)\\); print\\(''by difficulty:'', counts\\)\")",
+      "Bash(python:*)"
+    ]
+  }
+}

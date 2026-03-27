@@ -28,6 +28,16 @@ const SAVE_KEY    = "legal_rpg_save_v3";
 const RANKING_KEY = "legal_rpg_ranking_v1";
 const WRONG_KEY   = "legal_rpg_wrong_v1";   // ② 復習用
 const TIMER_SEC   = 30;
+const QUESTION_EVENTS = [
+  { id: "focus", label: "集中モード", text: "この問題はEXPボーナス +20%", expRate: 1.2, damageReduction: 0, timerDelta: 0 },
+  { id: "guard", label: "守りの構え", text: "この問題は被ダメージ -5", expRate: 1.0, damageReduction: 5, timerDelta: 0 },
+  { id: "rush", label: "緊急対応", text: "この問題は制限時間 -5秒 / EXP +30%", expRate: 1.3, damageReduction: 0, timerDelta: -5 },
+];
+const ACHIEVEMENTS = {
+  combo3: { key: "combo3", label: "🔥 3コンボ達成" },
+  fatalClear: { key: "fatalClear", label: "💀 即死問題クリア" },
+  noDamageStage: { key: "noDamageStage", label: "🛡 ノーダメージステージ" },
+};
 
 let allQuestions = [];
 
@@ -37,6 +47,9 @@ const state = {
   stageIndex: 0, current: 0, hints: 1,
   items: { roppo: false, hanrei: false, ai: false },
   gameOver: false, cleared: false, combo: 0,
+  achievements: [],
+  achievementMap: {},
+  currentEvent: null,
   shuffledIndices: [],
   stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
   // ② 復習モード
@@ -90,17 +103,20 @@ const el = {
   scoreBanner:      document.getElementById("scoreBanner"),
   scoreBannerLabel: document.getElementById("scoreBannerLabel"),
   scoreBannerValue: document.getElementById("scoreBannerValue"),
+  achievementList:  document.getElementById("achievementList"),
+  eventInfo:        document.getElementById("eventInfo"),
 };
 
 // ── タイマー ──────────────────────────────────────
 let timerInterval = null;
 let timerRemaining = TIMER_SEC;
+let currentTimerSec = TIMER_SEC;
 let currentCorrectIdx = 0;
 let isAnswering = false;
 
 function startTimer() {
   clearTimer();
-  timerRemaining = TIMER_SEC;
+  timerRemaining = currentTimerSec;
   updateTimerDisplay();
   timerInterval = setInterval(() => {
     timerRemaining -= 1;
@@ -114,7 +130,7 @@ function clearTimer() {
 }
 
 function updateTimerDisplay() {
-  const pct = (timerRemaining / TIMER_SEC) * 100;
+  const pct = (timerRemaining / Math.max(1, currentTimerSec)) * 100;
   el.timerBar.style.width = pct + "%";
   el.timerText.textContent = `${timerRemaining}秒`;
   el.timerBar.style.background =
@@ -133,12 +149,14 @@ function timeUp() {
   state.combo = 0;
 
   let msg = "";
+  const event = state.currentEvent || { damageReduction: 0 };
   if (!state.reviewMode) {
     if (q.fatal) {
       state.hp = 0;
       msg = `⏰ 時間切れ！💀 致命的ミス — HP全消滅！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     } else {
-      const damage = state.items.ai ? 10 : 20;
+      const baseDamage = state.items.ai ? 10 : 20;
+      const damage = Math.max(1, baseDamage - (event.damageReduction || 0));
       state.hp = Math.max(0, state.hp - damage);
       msg = `⏰ 時間切れ！ HP -${damage}\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     }
@@ -205,7 +223,15 @@ function saveState() {
 function loadState() {
   const raw = localStorage.getItem(SAVE_KEY);
   if (!raw) return false;
-  try { Object.assign(state, JSON.parse(raw)); return true; } catch { return false; }
+  try {
+    Object.assign(state, JSON.parse(raw));
+    if (!Array.isArray(state.achievements)) state.achievements = [];
+    if (!state.achievementMap || typeof state.achievementMap !== "object") state.achievementMap = {};
+    if (!state.currentEvent) state.currentEvent = null;
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // ── ② 復習リスト管理 ──────────────────────────────
@@ -253,12 +279,45 @@ function updateStatus() {
     ? "復習モード"
     : `Stage ${state.stageIndex + 1}/${STAGES.length} ${STAGES[state.stageIndex].name}`;
   el.sHint.textContent     = String(state.hints);
+  if (el.achievementList) {
+    el.achievementList.textContent = state.achievements.length > 0
+      ? state.achievements.join(" / ")
+      : "未獲得";
+  }
   syncItemButtons();
+}
+
+function unlockAchievement(def) {
+  if (!def || state.achievementMap[def.key]) return "";
+  state.achievementMap[def.key] = true;
+  state.achievements.push(def.label);
+  return `\n🏅 実績解除: ${def.label}`;
+}
+
+function rollQuestionEvent() {
+  state.currentEvent = null;
+  currentTimerSec = TIMER_SEC;
+  if (state.reviewMode) {
+    el.eventInfo.classList.add("hidden");
+    el.eventInfo.textContent = "";
+    return;
+  }
+  if (Math.random() < 0.35) {
+    const picked = QUESTION_EVENTS[Math.floor(Math.random() * QUESTION_EVENTS.length)];
+    state.currentEvent = picked;
+    currentTimerSec = Math.max(10, TIMER_SEC + (picked.timerDelta || 0));
+    el.eventInfo.textContent = `🎲 ${picked.label}: ${picked.text}`;
+    el.eventInfo.classList.remove("hidden");
+  } else {
+    el.eventInfo.classList.add("hidden");
+    el.eventInfo.textContent = "";
+  }
 }
 
 // ── 問題表示 ──────────────────────────────────────
 function showQuestion() {
   isAnswering = false;
+  rollQuestionEvent();
   const qs = getActiveQuestions();
   const q  = qs[state.shuffledIndices[state.current]];
 
@@ -309,6 +368,7 @@ function answerQuestion(selected) {
   clearTimer();
 
   const q = getActiveQuestions()[state.shuffledIndices[state.current]];
+  const event = state.currentEvent || { expRate: 1.0, damageReduction: 0 };
   const correct = selected === currentCorrectIdx;
 
   // ① ボタンをハイライト → 700ms後に結果表示
@@ -339,7 +399,7 @@ function answerQuestion(selected) {
     const mult    = comboMultiplier(state.combo);
     const speed   = speedBonus(timerRemaining);
     const baseExp = EXP_PER_STAGE[state.stageIndex] ?? 10;
-    const gained  = Math.floor(baseExp * mult);
+    const gained  = Math.floor(baseExp * mult * (event.expRate || 1.0));
     const bonus   = Math.floor(baseExp * speed);
     state.exp += gained + bonus;
     state.stageCorrect += 1;
@@ -347,6 +407,8 @@ function answerQuestion(selected) {
     if (state.combo >= 2) msg += ` 🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`;
     if (bonus > 0) msg += ` ⚡ 速答ボーナス +${bonus}`;
     msg += "\n";
+    if (q.fatal) msg += unlockAchievement(ACHIEVEMENTS.fatalClear);
+    if (state.combo >= 3) msg += unlockAchievement(ACHIEVEMENTS.combo3);
     while (state.exp >= state.lv * 50) {
       state.lv += 1;
       msg += `⬆️ レベルアップ！ LV${state.lv}\n`;
@@ -358,7 +420,8 @@ function answerQuestion(selected) {
       state.hp = 0;
       msg += `💀 致命的ミス！ HP全消滅！\n`;
     } else {
-      const damage = state.items.ai ? 10 : 20;
+      const baseDamage = state.items.ai ? 10 : 20;
+      const damage = Math.max(1, baseDamage - (event.damageReduction || 0));
       state.hp = Math.max(0, state.hp - damage);
       msg += `❌ 不正解… HP -${damage}\n`;
     }
@@ -418,6 +481,9 @@ function handleAfterAnswer(msg, correct) {
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n次のステージ: ${STAGES[state.stageIndex + 1].name}`;
       msg += `\n新役職: ${nextRole} / ヒント +1 獲得`;
+      if (state.hp >= state.stageStartHp) {
+        msg += unlockAchievement(ACHIEVEMENTS.noDamageStage);
+      }
 
       state.stageIndex += 1;
       state.current = 0;
@@ -570,6 +636,9 @@ function startGame() {
     stageIndex: 0, current: 0, hints: 1,
     items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
+    achievements: [],
+    achievementMap: {},
+    currentEvent: null,
     shuffledIndices: [],
     stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
     reviewMode: false, reviewPool: [], reviewCorrect: 0,
@@ -597,6 +666,7 @@ function startReviewMode() {
     shuffledIndices: [],
     items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
+    currentEvent: null,
   });
   buildShuffledIndices();
   showGameUI();
