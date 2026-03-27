@@ -688,7 +688,7 @@ function showGameUI() {
   el.startSection.classList.add("hidden");
   panels.forEach(id => document.getElementById(id).classList.add("hidden"));
   el.statusSection.classList.remove("hidden");
-  el.itemSection.classList.remove("hidden");
+  if (el.itemSection) el.itemSection.classList.remove("hidden");
   updateStatus();
   SoundEngine.startBgm();
   showQuestion();
@@ -700,9 +700,8 @@ function restartGame() {
   localStorage.removeItem(SAVE_KEY);
   el.playerName.value = "";
   el.startSection.classList.remove("hidden");
-  ["statusSection","itemSection","quizSection","resultSection"].forEach(id =>
-    document.getElementById(id).classList.add("hidden")
-  );
+  ["statusSection","quizSection","resultSection"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  if (el.itemSection) el.itemSection.classList.add("hidden");
   updateReviewBtn();
 }
 
@@ -715,7 +714,7 @@ function resumeOrShowStart() {
   el.playerName.value = state.name;
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
-  el.itemSection.classList.remove("hidden");
+  if (el.itemSection) el.itemSection.classList.remove("hidden");
   updateStatus();
   const perRun = state.shuffledIndices.length;
   if (state.current < perRun && !state.gameOver && !state.cleared) {
@@ -734,9 +733,9 @@ el.playerName.addEventListener("keydown", e => { if (e.key === "Enter") startGam
 el.nextBtn.addEventListener("click", showQuestion);
 el.restartBtn.addEventListener("click", restartGame);
 el.hintBtn.addEventListener("click", showHint);
-el.itemRoppoBtn.addEventListener("click", () => useItem("roppo"));
-el.itemHanreiBtn.addEventListener("click", () => useItem("hanrei"));
-el.itemAIBtn.addEventListener("click", () => useItem("ai"));
+if (el.itemRoppoBtn) el.itemRoppoBtn.addEventListener("click", () => useItem("roppo"));
+if (el.itemHanreiBtn) el.itemHanreiBtn.addEventListener("click", () => useItem("hanrei"));
+if (el.itemAIBtn) el.itemAIBtn.addEventListener("click", () => useItem("ai"));
 el.reviewBtn.addEventListener("click", startReviewMode);
 
 el.showRankingBtn.addEventListener("click", () => { renderRanking(); showPanel("rankingSection"); });
