@@ -27,6 +27,7 @@ function speedBonus(remaining) {
 const SAVE_KEY    = "legal_rpg_save_v3";
 const RANKING_KEY = "legal_rpg_ranking_v1";
 const WRONG_KEY   = "legal_rpg_wrong_v1";   // ② 復習用
+const STATS_KEY   = "legal_rpg_stats_v1";
 const TIMER_SEC   = 30;
 const QUESTION_EVENTS = [
   { id: "focus", label: "集中モード", text: "この問題はEXPボーナス +20%", expRate: 1.2, damageReduction: 0, timerDelta: 0 },
@@ -55,6 +56,8 @@ const state = {
   reviewMode: false,
   reviewPool: [],
   reviewCorrect: 0,
+  practiceMode: false,
+  practiceTheme: "",
 };
 
 const el = {
@@ -69,6 +72,16 @@ const el = {
   clearRankingBtn: document.getElementById("clearRankingBtn"),
   reviewBtn:       document.getElementById("reviewBtn"),
   reviewCount:     document.getElementById("reviewCount"),
+  stageMapBtn:     document.getElementById("stageMapBtn"),
+  statsBtn:        document.getElementById("statsBtn"),
+  themeBtn:        document.getElementById("themeBtn"),
+  stageMapSection: document.getElementById("stageMapSection"),
+  statsSection:    document.getElementById("statsSection"),
+  themePracticeSection: document.getElementById("themePracticeSection"),
+  stageMapGrid:    document.getElementById("stageMapGrid"),
+  statsContent:    document.getElementById("statsContent"),
+  clearStatsBtn:   document.getElementById("clearStatsBtn"),
+  themeGrid:       document.getElementById("themeGrid"),
   sName:     document.getElementById("sName"),
   sRole:     document.getElementById("sRole"),
   sLv:       document.getElementById("sLv"),
@@ -221,6 +234,8 @@ function loadState() {
     if (!Array.isArray(state.achievements)) state.achievements = [];
     if (!state.achievementMap || typeof state.achievementMap !== "object") state.achievementMap = {};
     if (!state.currentEvent) state.currentEvent = null;
+    if (typeof state.practiceMode !== "boolean") state.practiceMode = false;
+    if (typeof state.practiceTheme !== "string") state.practiceTheme = "";
     return true;
   } catch {
     return false;
@@ -230,6 +245,76 @@ function loadState() {
 // ── ② 復習リスト管理 ──────────────────────────────
 function getWrongAnswers() {
   try { return JSON.parse(localStorage.getItem(WRONG_KEY) || "[]"); } catch { return []; }
+}
+
+function getThemeStats() {
+  try { return JSON.parse(localStorage.getItem(STATS_KEY) || "{}"); } catch { return {}; }
+}
+
+function saveThemeStats(stats) {
+  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+}
+
+function recordThemeStat(theme, correct) {
+  if (!theme || state.reviewMode) return;
+  const stats = getThemeStats();
+  if (!stats[theme]) stats[theme] = { correct: 0, total: 0 };
+  stats[theme].total += 1;
+  if (correct) stats[theme].correct += 1;
+  saveThemeStats(stats);
+}
+
+function renderStats() {
+  const stats = getThemeStats();
+  const entries = Object.entries(stats).sort((a, b) => b[1].total - a[1].total);
+  if (entries.length === 0) {
+    el.statsContent.innerHTML = '<p class="stats-empty">まだ統計データがありません。</p>';
+    return;
+  }
+  el.statsContent.innerHTML = entries.map(([theme, v]) => {
+    const rate = v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0;
+    return `<div class="stats-row">
+      <div class="stats-theme">${theme}</div>
+      <div class="stats-bar-bg"><div class="stats-bar-fill" style="width:${rate}%"></div></div>
+      <div class="stats-label">${v.correct}/${v.total} (${rate}%)</div>
+    </div>`;
+  }).join("");
+}
+
+function renderStageMap() {
+  const nodes = STAGES.map((s, idx) => {
+    let stateClass = "locked";
+    let status = "🔒";
+    if (state.cleared || idx < state.stageIndex) { stateClass = "cleared"; status = "✅"; }
+    else if (idx === state.stageIndex) { stateClass = "available"; status = "▶"; }
+    return `<div class="stage-node ${stateClass}">
+      <div class="stage-node-num">Stage ${idx + 1}</div>
+      <div class="stage-node-name">${s.name}</div>
+      <div class="stage-node-role">${s.role}</div>
+      <div class="stage-node-status">${status}</div>
+    </div>`;
+  }).join("");
+  el.stageMapGrid.innerHTML = nodes;
+}
+
+function renderThemePractice() {
+  const counts = {};
+  allQuestions.forEach((q) => { counts[q.theme] = (counts[q.theme] || 0) + 1; });
+  const themes = Object.keys(counts).sort();
+  el.themeGrid.innerHTML = themes.map((theme) =>
+    `<button class="theme-btn" data-theme="${theme}">${theme}<span class="theme-count">${counts[theme]}問</span></button>`
+  ).join("");
+  Array.from(el.themeGrid.querySelectorAll(".theme-btn")).forEach((btn) => {
+    btn.addEventListener("click", () => startThemePractice(btn.dataset.theme));
+  });
+}
+
+function togglePanel(targetSection) {
+  [el.rankingSection, el.stageMapSection, el.statsSection, el.themePracticeSection].forEach((section) => {
+    if (!section) return;
+    if (section === targetSection) section.classList.toggle("hidden");
+    else section.classList.add("hidden");
+  });
 }
 
 function saveWrongAnswer(id) {
@@ -323,7 +408,8 @@ function showQuestion() {
 
   el.fatalWarning.classList.toggle("hidden", !q.fatal || state.reviewMode);
 
-  el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""} [${q.theme}] ${q.text}`;
+  const modeLabel = state.practiceMode ? " [練習]" : state.reviewMode ? " [復習]" : "";
+  el.questionText.textContent = `Q${state.current + 1}${modeLabel} [${q.theme}] ${q.text}`;
   el.choices.innerHTML = "";
 
   const choiceOrder = shuffle([...Array(q.choices.length).keys()]);
@@ -361,8 +447,12 @@ function answerQuestion(selected) {
     // ② 復習モード：HP/EXP変動なし
     if (correct) {
       state.reviewCorrect += 1;
-      removeWrongAnswer(q.id);
-      msg += "✅ 正解！ 復習リストから削除しました\n";
+      if (state.practiceMode) {
+        msg += "✅ 正解！\n";
+      } else {
+        removeWrongAnswer(q.id);
+        msg += "✅ 正解！ 復習リストから削除しました\n";
+      }
     } else {
       msg += "❌ 不正解\n";
       msg += `正解: ${q.choices[q.answer]}\n`;
@@ -374,6 +464,7 @@ function answerQuestion(selected) {
   }
 
   // 通常モード
+  recordThemeStat(q.theme, correct);
   if (correct) {
     state.combo += 1;
     const mult    = comboMultiplier(state.combo);
@@ -420,8 +511,12 @@ function handleAfterAnswer(msg, correct) {
   if (state.reviewMode) {
     if (state.current >= perRun) {
       const total = perRun;
-      msg += `\n\n📚 復習完了！ ${state.reviewCorrect}/${total}問 正解`;
-      msg += `\n正解した問題は復習リストから削除されました。`;
+      if (state.practiceMode) {
+        msg += `\n\n🎯 テーマ練習完了！ ${state.reviewCorrect}/${total}問 正解`;
+      } else {
+        msg += `\n\n📚 復習完了！ ${state.reviewCorrect}/${total}問 正解`;
+        msg += `\n正解した問題は復習リストから削除されました。`;
+      }
       el.nextBtn.classList.add("hidden");
       el.restartBtn.classList.remove("hidden");
       el.shareBtn.classList.add("hidden");
@@ -605,6 +700,7 @@ function startGame() {
     shuffledIndices: [],
     stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
     reviewMode: false, reviewPool: [], reviewCorrect: 0,
+    practiceMode: false, practiceTheme: "",
   });
   buildShuffledIndices();
   showGameUI();
@@ -622,10 +718,34 @@ function startReviewMode() {
   Object.assign(state, {
     name,
     reviewMode: true,
+    practiceMode: false,
+    practiceTheme: "",
     reviewPool: pool,
     reviewCorrect: 0,
     current: 0,
     hints: 1,
+    shuffledIndices: [],
+    gameOver: false, cleared: false, combo: 0,
+    currentEvent: null,
+  });
+  buildShuffledIndices();
+  showGameUI();
+}
+
+function startThemePractice(theme) {
+  const pool = allQuestions.filter(q => q.theme === theme);
+  if (pool.length === 0) { alert("このテーマの問題が見つかりません。"); return; }
+
+  const name = el.playerName.value.trim() || "プレイヤー";
+  Object.assign(state, {
+    name,
+    reviewMode: true,
+    practiceMode: true,
+    practiceTheme: theme,
+    reviewPool: pool,
+    reviewCorrect: 0,
+    current: 0,
+    hints: 99,
     shuffledIndices: [],
     gameOver: false, cleared: false, combo: 0,
     currentEvent: null,
@@ -698,12 +818,30 @@ el.shareBtn.addEventListener("click", () => {
 
 el.showRankingBtn.addEventListener("click", () => {
   renderRanking();
-  el.rankingSection.classList.toggle("hidden");
+  togglePanel(el.rankingSection);
+});
+el.stageMapBtn.addEventListener("click", () => {
+  renderStageMap();
+  togglePanel(el.stageMapSection);
+});
+el.statsBtn.addEventListener("click", () => {
+  renderStats();
+  togglePanel(el.statsSection);
+});
+el.themeBtn.addEventListener("click", () => {
+  renderThemePractice();
+  togglePanel(el.themePracticeSection);
 });
 el.clearRankingBtn.addEventListener("click", () => {
   if (confirm("ランキングを全件削除しますか？")) {
     localStorage.removeItem(RANKING_KEY);
     renderRanking();
+  }
+});
+el.clearStatsBtn.addEventListener("click", () => {
+  if (confirm("正答率統計をリセットしますか？")) {
+    localStorage.removeItem(STATS_KEY);
+    renderStats();
   }
 });
 
@@ -712,6 +850,9 @@ fetch("questions.json")
   .then(r => r.json())
   .then(questions => {
     allQuestions = questions;
+    renderStageMap();
+    renderStats();
+    renderThemePractice();
     resumeOrShowStart();
   })
   .catch(() => {
