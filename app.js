@@ -32,6 +32,19 @@ const STATS_KEY    = "legal_rpg_stats_v1";
 const TIMER_SEC    = 30;
 
 let allQuestions = [];
+const SoundEngine = window.SoundEngine || {
+  startBgm() {},
+  stopBgm() {},
+  toggleMute() { return true; },
+  playTimeUp() {},
+  playFatalWarning() {},
+  playCorrect() {},
+  playWrong() {},
+  playCombo() {},
+  playStageClear() {},
+  playGameOver() {},
+  playFullClear() {},
+};
 
 const state = {
   name: "", hp: 100, exp: 0, lv: 1,
@@ -635,6 +648,10 @@ function useItem(type) {
 
 // ── ゲーム開始・終了 ───────────────────────────────
 function startGame() {
+  if (!allQuestions || allQuestions.length === 0) {
+    alert("問題を読み込み中です。少し待ってから開始してください。");
+    return;
+  }
   const name = el.playerName.value.trim();
   if (!name) { alert("プレイヤー名を入力してください。"); return; }
   Object.assign(state, {
@@ -738,10 +755,15 @@ document.querySelectorAll("[data-close-panel]").forEach(btn => {
   btn.addEventListener("click", () => panels.forEach(id => document.getElementById(id).classList.add("hidden")));
 });
 
-document.getElementById("soundToggleBtn").addEventListener("click", () => {
-  const muted = SoundEngine.toggleMute();
-  document.getElementById("soundToggleBtn").textContent = muted ? "🔇" : "🔊";
-});
+{
+  const soundBtn = document.getElementById("soundToggleBtn");
+  if (soundBtn) {
+    soundBtn.addEventListener("click", () => {
+      const muted = SoundEngine.toggleMute();
+      soundBtn.textContent = muted ? "🔇" : "🔊";
+    });
+  }
+}
 
 el.shareBtn.addEventListener("click", () => {
   const text = el.shareBtn.dataset.text || "";
