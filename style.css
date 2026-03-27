@@ -443,6 +443,10 @@ button:hover {
   background: #475569;
 }
 
+.panel-close-btn {
+  margin-top: 8px;
+}
+
 .btn-danger {
   background: #7f1d1d;
   margin-top: 10px;

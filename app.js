@@ -314,6 +314,12 @@ function togglePanel(targetSection) {
   });
 }
 
+function closeAllPanels() {
+  [el.rankingSection, el.stageMapSection, el.statsSection, el.themePracticeSection].forEach((section) => {
+    if (section) section.classList.add("hidden");
+  });
+}
+
 function saveWrongAnswer(id) {
   const list = getWrongAnswers();
   if (!list.includes(id)) {
@@ -735,6 +741,7 @@ function startThemePractice(theme) {
 }
 
 function showGameUI() {
+  closeAllPanels();
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
   updateStatus();
@@ -822,6 +829,12 @@ el.clearStatsBtn.addEventListener("click", () => {
     localStorage.removeItem(STATS_KEY);
     renderStats();
   }
+});
+Array.from(document.querySelectorAll("[data-close-panel]")).forEach((btn) => {
+  btn.addEventListener("click", () => {
+    closeAllPanels();
+    el.startSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 });
 
 // ── データ読み込み ─────────────────────────────────
