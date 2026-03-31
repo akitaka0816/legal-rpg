@@ -51,7 +51,6 @@ let questionsReady = false;
 const state = {
   name: "", hp: 100, exp: 0, lv: 1,
   stageIndex: 0, current: 0, hints: 1,
-  items: { roppo: false, hanrei: false, ai: false },
   gameOver: false, cleared: false, combo: 0,
   stageIntroPending: false,
   shuffledIndices: [],
@@ -64,7 +63,6 @@ const el = {
   statusSection:   document.getElementById("statusSection"),
   quizSection:     document.getElementById("quizSection"),
   resultSection:   document.getElementById("resultSection"),
-  itemSection:     document.getElementById("itemSection"),
   rankingSection:  document.getElementById("rankingSection"),
   stageMapSection: document.getElementById("stageMapSection"),
   statsSection:    document.getElementById("statsSection"),
@@ -86,11 +84,6 @@ const el = {
   sExp:      document.getElementById("sExp"),
   sProgress: document.getElementById("sProgress"),
   sStage:    document.getElementById("sStage"),
-  sHint:     document.getElementById("sHint"),
-  itemRoppoBtn:  document.getElementById("itemRoppoBtn"),
-  itemHanreiBtn: document.getElementById("itemHanreiBtn"),
-  itemAIBtn:     document.getElementById("itemAIBtn"),
-  itemInfo:      document.getElementById("itemInfo"),
   timerBar:  document.getElementById("timerBar"),
   timerText: document.getElementById("timerText"),
   questionText:  document.getElementById("questionText"),
@@ -160,11 +153,11 @@ function timeUp() {
   updateStats(q.theme, false);
   let msg = "";
   if (!state.reviewMode) {
-    if (q.fatal) {
+    if (isBossQuestion()) {
       state.hp = 0;
-      msg = `⏰ 時間切れ！💀 致命的ミス — HP全消滅！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
+      msg = `⏰ 時間切れ！💀 ボス戦敗北 — HP全消滅！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     } else {
-      const damage = state.items.ai ? 10 : 20;
+      const damage = 20;
       state.hp = Math.max(0, state.hp - damage);
       msg = `⏰ 時間切れ！ HP -${damage}\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     }
@@ -211,6 +204,11 @@ function buildShuffledIndices() {
     const perRun = STAGES[state.stageIndex].questionsPerRun;
     state.shuffledIndices = shuffle([...Array(qs.length).keys()]).slice(0, perRun);
   }
+}
+
+function isBossQuestion() {
+  if (state.reviewMode) return false;
+  return state.current === STAGES[state.stageIndex].questionsPerRun - 1;
 }
 
 function currentRole() {
@@ -318,12 +316,6 @@ function renderStats() {
 }
 
 // ── UI更新 ────────────────────────────────────────
-function syncItemButtons() {
-  if (el.itemRoppoBtn)  el.itemRoppoBtn.disabled  = state.items.roppo;
-  if (el.itemHanreiBtn) el.itemHanreiBtn.disabled = state.items.hanrei;
-  if (el.itemAIBtn)     el.itemAIBtn.disabled     = state.items.ai;
-}
-
 function updateStatus() {
   const perRun = state.shuffledIndices.length || STAGES[state.stageIndex].questionsPerRun;
   el.sName.textContent     = state.name;
@@ -335,8 +327,6 @@ function updateStatus() {
   el.sStage.textContent    = state.reviewMode
     ? "復習モード"
     : `Stage ${state.stageIndex + 1}/${STAGES.length} ${STAGES[state.stageIndex].name}`;
-  if (el.sHint) el.sHint.textContent = String(state.hints);
-  syncItemButtons();
 }
 
 // ── パネル切替 ────────────────────────────────────
@@ -386,25 +376,20 @@ function showQuestion() {
     el.comboDisplay.classList.add("hidden");
   }
 
-  el.fatalWarning.classList.toggle("hidden", !q.fatal || state.reviewMode);
-  if (q.fatal && !state.reviewMode) setTimeout(() => SoundEngine.playFatalWarning(), 300);
-  el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""} [${q.theme}] ${q.text}`;
+  const isBoss = isBossQuestion();
+  el.fatalWarning.classList.toggle("hidden", !isBoss);
+  if (isBoss) setTimeout(() => SoundEngine.playFatalWarning(), 300);
+  el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""}${isBoss ? " [⚔️BOSS]" : ""} [${q.theme}] ${q.text}`;
   el.choices.innerHTML = "";
 
   const choiceOrder    = shuffle([...Array(q.choices.length).keys()]);
   currentCorrectIdx    = choiceOrder.indexOf(q.answer);
-  const removableWrong = shuffle(choiceOrder.filter(i => i !== q.answer))
-    .slice(0, Math.floor((q.choices.length - 1) / 2));
 
   choiceOrder.forEach((origIdx, displayIdx) => {
     const b = document.createElement("button");
     b.className   = "choice-btn";
     b.textContent = `${displayIdx + 1}. ${q.choices[origIdx]}`;
     b.addEventListener("click", () => answerQuestion(displayIdx));
-    if (!state.reviewMode && state.items.hanrei && removableWrong.includes(origIdx)) {
-      b.disabled    = true;
-      b.textContent = `${displayIdx + 1}. ${q.choices[origIdx]}（判例DBで除外）`;
-    }
     el.choices.appendChild(b);
   });
 
@@ -463,11 +448,11 @@ function answerQuestion(selected) {
   } else {
     state.combo = 0;
     saveWrongAnswer(q.id);
-    if (q.fatal) {
+    if (isBossQuestion()) {
       state.hp = 0;
-      msg += `💀 致命的ミス！ HP全消滅！\n`;
+      msg += `💀 ボス戦敗北！ HP全消滅！\n`;
     } else {
-      const damage = state.items.ai ? 10 : 20;
+        const damage = 20;
       state.hp = Math.max(0, state.hp - damage);
       msg += `❌ 不正解… HP -${damage}\n`;
     }
@@ -650,27 +635,15 @@ function renderRanking() {
   ).join("");
 }
 
-// ── ヒント・アイテム ───────────────────────────────
+// ── ヒント ────────────────────────────────────────
 function showHint() {
   if (state.hints <= 0) { alert("ヒント残数がありません。"); return; }
   const q = getActiveQuestions()[state.shuffledIndices[state.current]];
   state.hints -= 1;
-  el.hintText.textContent = `ヒント: ${q.hint || "法令の趣旨と原則を確認しましょう。"}`;
-  el.hintText.classList.remove("hidden");
-  updateStatus();
-  saveState();
-}
-
-function useItem(type) {
-  if (state.items[type]) return;
-  const msgs = {
-    roppo:  "六法を装備しました。ヒント残数 +1。",
-    hanrei: "判例DBを装備しました。問題ごとに一部選択肢を除外します。",
-    ai:     "生成AIアシストを装備しました。不正解時のHP減少が軽減されます。",
-  };
-  state.items[type] = true;
-  if (type === "roppo") state.hints += 1;
-  el.itemInfo.textContent = msgs[type];
+  if (el.hintText) {
+    el.hintText.textContent = `ヒント: ${q.hint || "法令の趣旨と原則を確認しましょう。"}`;
+    el.hintText.classList.remove("hidden");
+  }
   updateStatus();
   saveState();
 }
@@ -686,7 +659,6 @@ function startGame() {
   Object.assign(state, {
     name, hp: 100, exp: 0, lv: 1,
     stageIndex: 0, current: 0, hints: 1,
-    items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0,
     stageIntroPending: true,
     shuffledIndices: [],
@@ -707,7 +679,6 @@ function startReviewMode() {
   Object.assign(state, {
     name, reviewMode: true, reviewPool: pool, reviewCorrect: 0,
     current: 0, hints: 1, shuffledIndices: [],
-    items: { roppo: false, hanrei: false, ai: false },
     gameOver: false, cleared: false, combo: 0, stageIntroPending: false,
   });
   buildShuffledIndices();
@@ -718,7 +689,6 @@ function showGameUI() {
   el.startSection.classList.add("hidden");
   panels.forEach(id => document.getElementById(id).classList.add("hidden"));
   el.statusSection.classList.remove("hidden");
-  if (el.itemSection) el.itemSection.classList.remove("hidden");
   updateStatus();
   SoundEngine.startBgm();
   showQuestion();
@@ -731,7 +701,6 @@ function restartGame() {
   el.playerName.value = "";
   el.startSection.classList.remove("hidden");
   ["statusSection","quizSection","resultSection"].forEach(id => document.getElementById(id).classList.add("hidden"));
-  if (el.itemSection) el.itemSection.classList.add("hidden");
   updateReviewBtn();
 }
 
@@ -744,7 +713,6 @@ function resumeOrShowStart() {
   el.playerName.value = state.name;
   el.startSection.classList.add("hidden");
   el.statusSection.classList.remove("hidden");
-  if (el.itemSection) el.itemSection.classList.remove("hidden");
   updateStatus();
   const perRun = state.shuffledIndices.length;
   if (state.current < perRun && !state.gameOver && !state.cleared) {
@@ -765,10 +733,7 @@ el.nextBtn.addEventListener("click", () => {
   showQuestion();
 });
 el.restartBtn.addEventListener("click", restartGame);
-el.hintBtn.addEventListener("click", showHint);
-if (el.itemRoppoBtn) el.itemRoppoBtn.addEventListener("click", () => useItem("roppo"));
-if (el.itemHanreiBtn) el.itemHanreiBtn.addEventListener("click", () => useItem("hanrei"));
-if (el.itemAIBtn) el.itemAIBtn.addEventListener("click", () => useItem("ai"));
+if (el.hintBtn) el.hintBtn.addEventListener("click", showHint);
 el.reviewBtn.addEventListener("click", startReviewMode);
 
 el.showRankingBtn.addEventListener("click", () => { renderRanking(); showPanel("rankingSection"); });
