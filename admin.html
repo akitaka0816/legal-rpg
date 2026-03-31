@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>法務RPG 問題編集ツール</title>
+<title>法務クイズ研修 — 問題編集ツール</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; background: #1a1a2e; color: #e0e0e0; min-height: 100vh; }
@@ -112,7 +112,7 @@
 
 <div id="drop-screen">
   <header>
-    <h1>法務RPG 問題編集ツール</h1>
+    <h1>法務クイズ研修 — 問題編集ツール</h1>
     <div class="header-actions">
       <span style="font-size:12px;color:#666;">questions.json を読み込んでください</span>
     </div>
@@ -127,7 +127,7 @@
 
 <div id="editor">
   <header>
-    <h1>法務RPG 問題編集ツール</h1>
+    <h1>法務クイズ研修 — 問題編集ツール</h1>
     <div class="header-actions">
       <span id="modified-count" style="font-size:12px;color:#e26f6f;"></span>
       <button class="btn-secondary btn-small" onclick="addQuestion()">＋ 問題追加</button>
@@ -217,7 +217,12 @@ function loadFile(file) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      questions = JSON.parse(e.target.result);
+      const data = JSON.parse(e.target.result);
+      if (!Array.isArray(data)) {
+        alert('questions.json は配列（[ ... ]）形式である必要があります。');
+        return;
+      }
+      questions = data;
       init();
     } catch(err) {
       alert('JSONの解析に失敗しました: ' + err.message);
@@ -359,7 +364,7 @@ function renderForm(i) {
       <div class="form-row">
         <label>
           <input type="checkbox" id="f-fatal" ${q.fatal ? 'checked' : ''} style="accent-color:#e26f6f">
-          &nbsp;Fatal問題（不正解でゲームオーバー）
+          &nbsp;fatal フラグ（現行の研修プレイ画面では未使用。データ互換のため保持）
         </label>
       </div>
     </div>
@@ -400,13 +405,14 @@ function flushCurrentEdits() {
 function saveCurrentEdits(i, silent) {
   const q = questions[i];
   const get = id => { const el = document.getElementById(id); return el ? el.value : null; };
+  const { hint: _omitHint, ...qNoHint } = q;
 
   const newChoices = [0,1,2,3].map(ci => get(`choice-${ci}`) ?? (q.choices||[])[ci] ?? '');
   const answerEl = document.querySelector('input[name="answer"]:checked');
   const newAnswer = answerEl ? parseInt(answerEl.value) : q.answer;
 
   const newQ = {
-    ...q,
+    ...qNoHint,
     id: get('f-id') ?? q.id,
     theme: get('f-theme') ?? q.theme,
     stage: parseInt(get('f-stage')) || q.stage,
@@ -441,12 +447,13 @@ function revertQuestion(i) {
 
 function deleteQuestion(i) {
   if (!confirm(`${questions[i].id} を削除しますか？`)) return;
+  const prevModified = new Set(modifiedSet);
   questions.splice(i, 1);
   modifiedSet.clear();
-  // インデックスずれを再計算
-  const newSet = new Set();
-  modifiedSet.forEach(mi => { if (mi < i) newSet.add(mi); else if (mi > i) newSet.add(mi - 1); });
-  modifiedSet = newSet;
+  prevModified.forEach(mi => {
+    if (mi < i) modifiedSet.add(mi);
+    else if (mi > i) modifiedSet.add(mi - 1);
+  });
   currentIndex = null;
   document.getElementById('no-selection').style.display = 'flex';
   document.getElementById('form-area').style.display = 'none';
@@ -476,9 +483,18 @@ function addTag() {
 }
 
 // ---- 問題追加 ----
+function suggestNextId() {
+  let max = 0;
+  questions.forEach(q => {
+    const m = /^q(\d+)$/i.exec(String(q.id || ''));
+    if (m) max = Math.max(max, parseInt(m[1], 10));
+  });
+  return 'q' + String(max + 1).padStart(3, '0');
+}
+
 function addQuestion() {
   document.getElementById('add-modal').classList.add('open');
-  document.getElementById('new-id').value = 'q' + String(questions.length + 1).padStart(3, '0');
+  document.getElementById('new-id').value = suggestNextId();
   document.getElementById('new-theme').value = '';
   document.getElementById('new-stage').value = '1';
   document.getElementById('new-diff').value = '1';
@@ -499,7 +515,7 @@ function confirmAddQuestion() {
   const newQ = {
     id, theme, difficulty: diff, tags: [],
     text: '', choices: ['', '', '', ''], answer: 0,
-    explanation: '', hint: '', stage, fatal: false
+    explanation: '', stage, fatal: false
   };
   questions.push(newQ);
   closeAddModal();
@@ -512,6 +528,16 @@ function confirmAddQuestion() {
 // ---- ダウンロード ----
 function downloadJSON() {
   flushCurrentEdits();
+  for (let idx = 0; idx < questions.length; idx++) {
+    const qq = questions[idx];
+    const ans = qq.answer;
+    const ch = qq.choices || [];
+    if (typeof ans !== 'number' || ans < 0 || ans >= ch.length) {
+      alert(`問題 ${qq.id}: 正答インデックスが選択肢の範囲外です（answer=${ans}, 選択肢数=${ch.length}）。修正してから保存してください。`);
+      selectQuestion(idx);
+      return;
+    }
+  }
   const blob = new Blob([JSON.stringify(questions, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
