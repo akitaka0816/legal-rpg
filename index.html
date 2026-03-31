@@ -27,6 +27,21 @@
       </section>
 
       <!-- ⑧ ステージマップ -->
+      <!-- ストーリーイントロ -->
+      <section class="card hidden" id="stageIntroSection">
+        <div id="introChapter" class="intro-chapter"></div>
+        <div id="introScene" class="intro-scene"></div>
+        <hr class="intro-divider" />
+        <p id="introNarrative" class="intro-narrative"></p>
+        <div class="intro-skills-wrap">
+          <div class="intro-skills-header">── 習得スキル・知識 ──</div>
+          <ul id="introSkillsList" class="intro-skills-list"></ul>
+        </div>
+        <div id="introBossHint" class="intro-boss-hint"></div>
+        <button id="introStartBtn" class="intro-start-btn">⚔️ 冒険を開始する</button>
+      </section>
+
+      <!-- ⑧ ステージマップ -->
       <section class="card hidden" id="stageMapSection">
         <h2>📍 ステージマップ</h2>
         <div id="stageMapGrid" class="stage-map-grid"></div>
@@ -79,10 +94,6 @@
           ⚔️ ボス戦 — 不正解・時間切れで即ゲームオーバー！
         </div>
         <p id="questionText"></p>
-        <div class="quiz-actions">
-          <button id="hintBtn">ヒントを見る</button>
-        </div>
-        <p id="hintText" class="hint-text hidden"></p>
         <div id="choices"></div>
       </section>
 

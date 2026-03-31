@@ -1,11 +1,109 @@
 // ── ステージ定義 ───────────────────────────────────
 const STAGES = [
-  { id: 1, name: "入門編",   role: "新入社員",        questionsPerRun: 5 },
-  { id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 5 },
-  { id: 3, name: "応用実務", role: "法務担当",         questionsPerRun: 5 },
-  { id: 4, name: "実践編",   role: "シニア法務担当",   questionsPerRun: 5 },
-  { id: 5, name: "上級編",   role: "法務リーダー",     questionsPerRun: 5 },
-  { id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 5 },
+  {
+    id: 1, name: "入門編", role: "新入社員", questionsPerRun: 5,
+    story: {
+      chapter: "第一章　法務の扉を開けよ",
+      scene: "株式会社アクシス 法務部 — 入社3日目",
+      narrative: `春の朝。辞令を手に法務部の扉を叩いたあなたを迎えたのは、書類の山と鋭い眼光の田中主任だった。
+
+「ようこそ、法務部へ。ここは会社を守る最後の砦だ。
+一枚の契約書が会社を救うこともあれば、滅ぼすこともある。
+まず基礎を叩き込む。ついてこい。」
+
+法務という名の冒険が、いま始まった。`,
+      skills: ["基本的な契約書の構造と役割", "法律用語と法体系の初歩", "コンプライアンスの心構え"],
+      bossHint: "第一の試練：田中主任による入門試験",
+      clearStory: `「合格だ。筋がいい」\n田中主任が珍しく口角を上げた。\nあなたはアシスタントへと昇格し、次なる依頼の扉が開かれる。`,
+    },
+  },
+  {
+    id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 5,
+    story: {
+      chapter: "第二章　最初の依頼",
+      scene: "第3会議室 — 入社半年後",
+      narrative: `日常業務をこなしていたある朝、営業部の青木課長が息を切らして駆け込んできた。
+
+「頼む！ 来週、大口取引先と5000万の契約を結ぶんだ。
+この契約書を全部チェックしてほしい。何かリスクがあれば全部洗い出してくれ。
+失敗したら今期の成績が吹っ飛ぶんだよ！」
+
+一枚の契約書に潜む罠を、あなたは見抜けるか。`,
+      skills: ["契約条項のリスク識別", "表明保証・担保の基礎", "瑕疵担保責任と損害賠償"],
+      bossHint: "第二の試練：契約書の深部に潜む致命条項",
+      clearStory: `すべてのリスク条項を摘出し、取引先との修正交渉も成立。\n青木課長からの熱い握手とともに、あなたの名前は社内に広まり始めた。`,
+    },
+  },
+  {
+    id: 3, name: "応用実務", role: "法務担当", questionsPerRun: 5,
+    story: {
+      chapter: "第三章　嵐の訴訟",
+      scene: "法務部長室 — ある月曜日の早朝",
+      narrative: `出社するなり部長室に呼ばれた。机の上には一通の内容証明が置かれていた。
+
+「準大手の取引先から3億円の損害賠償請求だ。
+製品に瑕疵があったと主張している。
+担当はお前だ——証拠を集め、反論を組み立て、この戦いを制せ。」
+
+法廷という名のダンジョンが、あなたを待ち受ける。`,
+      skills: ["訴訟の流れと証拠収集の実務", "製品瑕疵と不法行為責任", "和解交渉と費用対効果分析"],
+      bossHint: "第三の試練：相手方弁護士が突きつける決定的証拠",
+      clearStory: `緻密な反証と法的主張が実を結び、請求額の大幅減額で和解成立。\n部長が静かに言った。「本物の法務担当になったな。」`,
+    },
+  },
+  {
+    id: 4, name: "実践編", role: "シニア法務担当", questionsPerRun: 5,
+    story: {
+      chapter: "第四章　国境を超えた戦い",
+      scene: "取締役会議室 — M&Aプロジェクト発足",
+      narrative: `訴訟での活躍が評価され、極秘プロジェクトへの参画を命じられた。
+
+「EU本拠の製造企業を500億で買収する計画だ。
+GDPR対応、独禁法クリアランス、クロスボーダーの契約設計——全部お前が仕切れ。
+競合他社も同じターゲットを狙っている。失敗は許されない。」
+
+国際法務の荒波の中、あなたの判断力が問われる。`,
+      skills: ["M&Aデューデリジェンスの実務", "GDPRと国際データ保護法", "独占禁止法と競争法対応"],
+      bossHint: "第四の試練：競合による買収阻止の法的妨害工作",
+      clearStory: `デューデリを完遂し、すべての法的障壁をクリア。買収は成立した。\nあなたはシニア担当として、国際案件の第一人者となった。`,
+    },
+  },
+  {
+    id: 5, name: "上級編", role: "法務リーダー", questionsPerRun: 5,
+    story: {
+      chapter: "第五章　内側からの嵐",
+      scene: "法務部 — 内部告発から48時間後",
+      narrative: `深夜、匿名の内部告発メールが届いた。経理部で組織的な不正が行われているという。
+
+部長が険しい顔で言う。
+「規制当局が動く前に、先手を打つしかない。
+調査チームを率いて全容を解明しろ。
+メディアも当局も、どちらも敵になりうる。」
+
+チームを率いるリーダーとして、あなたの本当の試練が始まる。`,
+      skills: ["内部調査と証拠保全の手法", "コンプライアンスプログラムの設計", "規制当局対応と危機管理"],
+      bossHint: "第五の試練：規制当局による抜き打ち立入検査",
+      clearStory: `全容解明と自主申告により、制裁は最小限に抑えられた。\nリーダーとしての手腕を見せたあなたの前に、最後の扉が開こうとしていた。`,
+    },
+  },
+  {
+    id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 5,
+    story: {
+      chapter: "最終章　法務責任者への試練",
+      scene: "取締役会議室 — 最終選考",
+      narrative: `すべての試練を乗り越えたあなたの前に、議長が静かに立っている。
+
+「次期法務責任者の候補は、あなた一人だ。
+しかしこのポストには、最高水準の法務判断力が求められる。
+今から最終試験を行う。
+合格すれば——この会社の法務を統括する地位が、あなたのものになる。」
+
+法務冒険の、最後の扉。すべてをここに賭けろ。`,
+      skills: ["経営戦略と法務ガバナンス", "コーポレートガバナンスの実践", "統合リスクマネジメント"],
+      bossHint: "最終ボス：取締役会による法務責任者就任審査",
+      clearStory: null,
+    },
+  },
 ];
 const CLEARED_ROLE  = "法務責任者";
 const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
@@ -50,7 +148,7 @@ let questionsReady = false;
 
 const state = {
   name: "", hp: 100, exp: 0, lv: 1,
-  stageIndex: 0, current: 0, hints: 1,
+  stageIndex: 0, current: 0,
   gameOver: false, cleared: false, combo: 0,
   stageIntroPending: false,
   shuffledIndices: [],
@@ -64,7 +162,8 @@ const el = {
   quizSection:     document.getElementById("quizSection"),
   resultSection:   document.getElementById("resultSection"),
   rankingSection:  document.getElementById("rankingSection"),
-  stageMapSection: document.getElementById("stageMapSection"),
+  stageMapSection:   document.getElementById("stageMapSection"),
+  stageIntroSection: document.getElementById("stageIntroSection"),
   statsSection:    document.getElementById("statsSection"),
   playerName:      document.getElementById("playerName"),
   startBtn:        document.getElementById("startBtn"),
@@ -87,8 +186,7 @@ const el = {
   timerBar:  document.getElementById("timerBar"),
   timerText: document.getElementById("timerText"),
   questionText:  document.getElementById("questionText"),
-  hintBtn:       document.getElementById("hintBtn"),
-  hintText:      document.getElementById("hintText"),
+
   choices:       document.getElementById("choices"),
   comboDisplay:  document.getElementById("comboDisplay"),
   fatalWarning:  document.getElementById("fatalWarning"),
@@ -204,6 +302,19 @@ function buildShuffledIndices() {
     const perRun = STAGES[state.stageIndex].questionsPerRun;
     state.shuffledIndices = shuffle([...Array(qs.length).keys()]).slice(0, perRun);
   }
+}
+
+function showStageIntro() {
+  const story = STAGES[state.stageIndex].story;
+  document.getElementById("introChapter").textContent   = story.chapter;
+  document.getElementById("introScene").textContent     = story.scene;
+  document.getElementById("introNarrative").textContent = story.narrative;
+  document.getElementById("introSkillsList").innerHTML  =
+    story.skills.map(s => `<li>${s}</li>`).join("");
+  document.getElementById("introBossHint").textContent  = story.bossHint;
+  el.quizSection.classList.add("hidden");
+  el.resultSection.classList.add("hidden");
+  el.stageIntroSection.classList.remove("hidden");
 }
 
 function isBossQuestion() {
@@ -342,18 +453,7 @@ function showPanel(panelId) {
 // ── 問題表示 ──────────────────────────────────────
 function showQuestion() {
   if (!state.reviewMode && state.stageIntroPending) {
-    const stage = STAGES[state.stageIndex];
-    el.quizSection.classList.add("hidden");
-    el.resultSection.classList.remove("hidden");
-    el.resultText.textContent =
-      `📣 Stage ${state.stageIndex + 1} 開始\n` +
-      `${stage.name}\n` +
-      `役職: ${stage.role}\n` +
-      `このステージは ${stage.questionsPerRun} 問です。`;
-    el.nextBtn.textContent = "このステージを開始";
-    el.nextBtn.classList.remove("hidden");
-    el.restartBtn.classList.add("hidden");
-    el.shareBtn.classList.add("hidden");
+    showStageIntro();
     return;
   }
 
@@ -365,8 +465,7 @@ function showQuestion() {
   el.resultSection.classList.add("hidden");
   el.nextBtn.textContent = "次へ";
   el.shareBtn.classList.add("hidden");
-  el.hintText.classList.add("hidden");
-  el.hintText.textContent = "";
+
 
   if (!state.reviewMode && state.combo >= 2) {
     const mult = comboMultiplier(state.combo);
@@ -501,11 +600,13 @@ function handleAfterAnswer(msg, correct) {
     const grade = calcGrade(state.stageCorrect, state.stageTotal, state.hp, state.stageStartHp);
 
     if (state.stageIndex < STAGES.length - 1) {
-      const clearedIdx = state.stageIndex;
-      const nextRole   = STAGES[state.stageIndex + 1].role;
+      const clearedIdx   = state.stageIndex;
+      const clearedStage = STAGES[clearedIdx];
+      const nextRole     = STAGES[state.stageIndex + 1].role;
       updateProgress(clearedIdx);
       SoundEngine.playStageClear();
       showStageClearOverlay(clearedIdx + 1, nextRole, grade.label, false);
+      if (clearedStage.story?.clearStory) msg += `\n\n${clearedStage.story.clearStory}`;
       msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n次のステージ: ${STAGES[state.stageIndex + 1].name}`;
@@ -514,7 +615,7 @@ function handleAfterAnswer(msg, correct) {
 
       state.stageIndex += 1;
       state.current = 0;
-      state.hints  += 1;
+
       state.combo   = 0;
       state.stageCorrect = 0;
       state.stageTotal   = 0;
@@ -534,7 +635,7 @@ function handleAfterAnswer(msg, correct) {
       SoundEngine.stopBgm();
       SoundEngine.playFullClear();
       showStageClearOverlay(STAGES.length, CLEARED_ROLE, grade.label, true);
-      msg += `\n\n法務責任者に就任しました！`;
+      msg += `\n\n——法務責任者に就任しました。\nあなたの決断と知識が、この会社を守り続けてきた。\n数々の試練を乗り越えたあなたは、今まさに法務の頂点に立つ。`;
       msg += `\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n最終スコア: ${score}`;
@@ -635,18 +736,6 @@ function renderRanking() {
   ).join("");
 }
 
-// ── ヒント ────────────────────────────────────────
-function showHint() {
-  if (state.hints <= 0) { alert("ヒント残数がありません。"); return; }
-  const q = getActiveQuestions()[state.shuffledIndices[state.current]];
-  state.hints -= 1;
-  if (el.hintText) {
-    el.hintText.textContent = `ヒント: ${q.hint || "法令の趣旨と原則を確認しましょう。"}`;
-    el.hintText.classList.remove("hidden");
-  }
-  updateStatus();
-  saveState();
-}
 
 // ── ゲーム開始・終了 ───────────────────────────────
 function startGame() {
@@ -658,7 +747,7 @@ function startGame() {
   if (!name) { alert("プレイヤー名を入力してください。"); return; }
   Object.assign(state, {
     name, hp: 100, exp: 0, lv: 1,
-    stageIndex: 0, current: 0, hints: 1,
+    stageIndex: 0, current: 0,
     gameOver: false, cleared: false, combo: 0,
     stageIntroPending: true,
     shuffledIndices: [],
@@ -678,7 +767,7 @@ function startReviewMode() {
   const name = el.playerName.value.trim() || "プレイヤー";
   Object.assign(state, {
     name, reviewMode: true, reviewPool: pool, reviewCorrect: 0,
-    current: 0, hints: 1, shuffledIndices: [],
+    current: 0, shuffledIndices: [],
     gameOver: false, cleared: false, combo: 0, stageIntroPending: false,
   });
   buildShuffledIndices();
@@ -700,7 +789,7 @@ function restartGame() {
   localStorage.removeItem(SAVE_KEY);
   el.playerName.value = "";
   el.startSection.classList.remove("hidden");
-  ["statusSection","quizSection","resultSection"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  ["statusSection","quizSection","resultSection","stageIntroSection"].forEach(id => document.getElementById(id).classList.add("hidden"));
   updateReviewBtn();
 }
 
@@ -728,12 +817,14 @@ function resumeOrShowStart() {
 // ── イベント ──────────────────────────────────────
 el.startBtn.addEventListener("click", startGame);
 el.playerName.addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
-el.nextBtn.addEventListener("click", () => {
-  if (!state.reviewMode && state.stageIntroPending) state.stageIntroPending = false;
+el.nextBtn.addEventListener("click", showQuestion);
+document.getElementById("introStartBtn").addEventListener("click", () => {
+  el.stageIntroSection.classList.add("hidden");
+  state.stageIntroPending = false;
   showQuestion();
 });
 el.restartBtn.addEventListener("click", restartGame);
-if (el.hintBtn) el.hintBtn.addEventListener("click", showHint);
+
 el.reviewBtn.addEventListener("click", startReviewMode);
 
 el.showRankingBtn.addEventListener("click", () => { renderRanking(); showPanel("rankingSection"); });
