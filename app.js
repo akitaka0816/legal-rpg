@@ -306,12 +306,23 @@ function buildShuffledIndices() {
 
 function showStageIntro() {
   const story = STAGES[state.stageIndex].story;
-  document.getElementById("introChapter").textContent   = story.chapter;
-  document.getElementById("introScene").textContent     = story.scene;
-  document.getElementById("introNarrative").textContent = story.narrative;
-  document.getElementById("introSkillsList").innerHTML  =
-    story.skills.map(s => `<li>${s}</li>`).join("");
-  document.getElementById("introBossHint").textContent  = story.bossHint;
+  const introChapter = document.getElementById("introChapter");
+  const introScene = document.getElementById("introScene");
+  const introNarrative = document.getElementById("introNarrative");
+  const introSkillsList = document.getElementById("introSkillsList");
+  const introBossHint = document.getElementById("introBossHint");
+
+  // ストーリー用DOMが無い環境でもゲーム進行を止めない
+  if (!el.stageIntroSection || !introChapter || !introScene || !introNarrative || !introSkillsList || !introBossHint) {
+    state.stageIntroPending = false;
+    return;
+  }
+
+  introChapter.textContent = story.chapter;
+  introScene.textContent = story.scene;
+  introNarrative.textContent = story.narrative;
+  introSkillsList.innerHTML = story.skills.map(s => `<li>${s}</li>`).join("");
+  introBossHint.textContent = story.bossHint;
   el.quizSection.classList.add("hidden");
   el.resultSection.classList.add("hidden");
   el.stageIntroSection.classList.remove("hidden");
@@ -789,7 +800,10 @@ function restartGame() {
   localStorage.removeItem(SAVE_KEY);
   el.playerName.value = "";
   el.startSection.classList.remove("hidden");
-  ["statusSection","quizSection","resultSection","stageIntroSection"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  ["statusSection","quizSection","resultSection","stageIntroSection"].forEach(id => {
+    const node = document.getElementById(id);
+    if (node) node.classList.add("hidden");
+  });
   updateReviewBtn();
 }
 
@@ -818,11 +832,16 @@ function resumeOrShowStart() {
 el.startBtn.addEventListener("click", startGame);
 el.playerName.addEventListener("keydown", e => { if (e.key === "Enter") startGame(); });
 el.nextBtn.addEventListener("click", showQuestion);
-document.getElementById("introStartBtn").addEventListener("click", () => {
-  el.stageIntroSection.classList.add("hidden");
-  state.stageIntroPending = false;
-  showQuestion();
-});
+{
+  const introStartBtn = document.getElementById("introStartBtn");
+  if (introStartBtn) {
+    introStartBtn.addEventListener("click", () => {
+      if (el.stageIntroSection) el.stageIntroSection.classList.add("hidden");
+      state.stageIntroPending = false;
+      showQuestion();
+    });
+  }
+}
 el.restartBtn.addEventListener("click", restartGame);
 
 el.reviewBtn.addEventListener("click", startReviewMode);
