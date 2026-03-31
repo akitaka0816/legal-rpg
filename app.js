@@ -3,101 +3,126 @@ const STAGES = [
   {
     id: 1, name: "入門編", role: "新入社員", questionsPerRun: 5,
     story: {
-      chapter: "第一章　法の素養の土台",
-      scene: "株式会社ひろせ 法務部 — 入門オリエンテーション",
-      narrative: `S課長はホワイトボードに分野名を並べた。
+      chapter: "ステージ1　新入社員",
+      scene: "株式会社ひろせ — 入門（法務・コンプラの素養）",
+      narrative: `【想定する役割】
+法務・コンプラに配属されたばかりの段階。専門家ではない前提で、用語と制度の“地図”を頭に置けること。
 
-「このステージのクイズでは、まず“言葉と枠組み”をおさえていただきます。
-法律用語の整理に加え、会社法・民法・独禁法・不競法の入口、労働法と派遣・職安の前提、そして個人情報の基本線——初日から幅広くお触れいただきます。
-難易度は入門ですが、分野はこれからずっとお使いになります。どうか頭の中に地図を描いていただければと思います。」
+【求められる視座・態度】
+分野ごとの論点を混同せず、依頼を受けたときに「どの法域の話か」を切り分けられること。
 
-ここからは、各論点の位置づけを押さえながら、ご挑戦ください。`,
+【主な知識・スキル領域】
+法律用語の整理、会社法・民法・独禁法・不競法の入口、労働法・派遣法・職安法の前提、個人情報保護の基本線。
+
+【出題の目安】
+難易度は入門。上記を横断して問う場合があります。`,
       skills: ["法律用語と論点の整理", "会社法・民法・独禁法・不競法の基礎概念", "労働法・派遣法・職安法と個人情報の入門"],
-      bossHint: "第一の試練：用語と多分野の入口（全問イージー）",
-      clearStory: `基礎の引き出しが揃った。\nS課長は頷いた。「次は、現場の相談に耐えていただく一般社員の視点でのステージです。引き続きよろしくお願いいたします。」`,
+      bossHint: "最終問題の目安：用語と多分野の入口（難易度・イージー）",
+      clearStory: `次のステージ（一般社員）では、部門横断の相談に耐えるための業務知と法知の接続が中心になります。`,
     },
   },
   {
     id: 2, name: "法務基礎", role: "一般社員", questionsPerRun: 5,
     story: {
-      chapter: "第二章　業務と法務の接点",
-      scene: "法務部 — 一般社員としての研修",
-      narrative: `営業部のH部長が、紙ではなく「論点リスト」を机に置いた。
+      chapter: "ステージ2　一般社員",
+      scene: "株式会社ひろせ — 法務基礎（業務と法の接点）",
+      narrative: `【想定する役割】
+各部署からの相談を受ける法務の実務担当。短時間で論点を特定し、説明可能な形に整えること。
 
-「一般社員の法務は、依頼の奥にある制度を短時間で押さえていただくお仕事です。
-このステージのクイズでは、個人情報と職安を軸に、法律用語を一段深め、会計・財務・人事・労務・戦略に触れ、マネジメントの言葉（KPI等）と法リスクをつなげていただきます。
-難易度はまだ基礎ではございますが、論点の種類は一気に増えますので、どうかご留意ください。」
+【求められる視座・態度】
+「現場の言葉」と「制度の言葉」を対応づけ、依頼の背後にある規制・リスクを説明できること。
 
-現場の言葉と制度の言葉を、同じテーブルにお載せいただけるかどうかが問われます。`,
+【主な知識・スキル領域】
+個人情報保護法、職安法、法律用語の再確認、会計・財務・人事・労務・戦略と法リスクの接続、マネジメント用語（KPI 等）とコンプラの関係。
+
+【出題の目安】
+難易度は基礎中心（一部ステップアップあり）。論点の種類が増えます。`,
       skills: ["人事・労務・職安法と採用・派遣の論点整理", "会計・財務・戦略の数字と法リスクの接続", "マネジメント上の意思決定とコンプライアンスのバランス"],
-      bossHint: "第二の試練：部門横断の“業務知×法知”",
-      clearStory: `相談の型が見えてきた。\n「次は係長としてのステージです。レビューと優先順位の付け方が問われます。引き続きよろしくお願いいたします。」`,
+      bossHint: "最終問題の目安：部門横断の業務知と法知",
+      clearStory: `次のステージ（係長）では、契約書審査を中心に、複数法分野を横断した実務判断が中心になります。`,
     },
   },
   {
     id: 3, name: "応用実務", role: "係長", questionsPerRun: 5,
     story: {
-      chapter: "第三章　レビューと横断の実務",
-      scene: "法務部 — 係長としてのスキルセット",
-      narrative: `法務課長は、積まれた契約書ではなく「チェック観点の一覧」を差し出した。
+      chapter: "ステージ3　係長",
+      scene: "株式会社ひろせ — 応用実務（レビューと横断）",
+      narrative: `【想定する役割】
+レビューとタスクの優先順位づけを担うライン。条文の趣旨を説明し、取引の型と規制の重なりを整理できること。
 
-「係長の皆さんのクイズでは、契約書審査が前面に出てまいります。
-加えて、会社法・民法・独禁法・不競法、金商法の入り口、会計の論点、GDPRと個人情報の実務が同じステージに並びます。
-出題は横断いたします。条文の言い回しに慣れ、誤った安心は手放していただければと存じます。難易度は中級でございます。」
+【求められる視座・態度】
+「正解暗記」ではなく、誤った安心を避け、リスクを言語化して関係者に伝えられること。
 
-レビューと優先順位づけが、ここから本番となります。`,
+【主な知識・スキル領域】
+契約書審査、会社法・民法・独禁法・不競法、金商法の入り口、会計論点、GDPR・個人情報の実務。
+
+【出題の目安】
+難易度は中級。横断出題になります。`,
       skills: ["契約書審査（条項の意図とリスクの言語化）", "会社法・民法・独禁法・不競法・金商法の実務接点", "個人情報・GDPRと会計論点の整理"],
-      bossHint: "第三の試練：契約レビュー＋横断法分野（中級・全問同格）",
-      clearStory: `論点の優先順位がついた。\n彼女は言った。「次は課長としてのステージです。チームを動かす前提の知識が問われます。どうぞよろしくお願いいたします。」`,
+      bossHint: "最終問題の目安：契約レビューと横断法分野（難易度・中級）",
+      clearStory: `次のステージ（課長）では、チームや部門をまたいだ説明責任と、優先順位に基づく判断の言語化が中心になります。`,
     },
   },
   {
     id: 4, name: "実践編", role: "課長", questionsPerRun: 5,
     story: {
-      chapter: "第四章　課としての設計と判断",
-      scene: "法務部 — 課長の意思決定",
-      narrative: `会議室の画面には、事業計画と法務チェックリストが並んだ。
+      chapter: "ステージ4　課長",
+      scene: "株式会社ひろせ — 実践編（課の設計と判断）",
+      narrative: `【想定する役割】
+課のリーダーとして、契約・人事・財務・戦略など複数論点を同じ時間軸で組み立て、関係者に説明できること。
 
-「課長としての皆さんには、契約レビューの速さだけでなく、人事・労務・会計・戦略と法務を同じ時間軸で組み立てる力が求められます。
-独禁・会社法・派遣・財務——出題はバラけることもございますが、根っこは“優先順位と説明責任”でございます。」
+【求められる視座・態度】
+トレードオフを隠さず、優先順位と説明責任を果たすこと。出題分野がバラけても、根は同じ整理軸に戻せること。
 
-このステージのクイズは、課長としての知識の幅と、判断の言語化を試すことになります。`,
+【主な知識・スキル領域】
+契約・民法・会社法、人事・労務・派遣、会計・財務・戦略、独禁法、個人情報・GDPR などの横断。
+
+【出題の目安】
+難易度は中級中心（一部上級）。知識の幅と判断の言語化を問います。`,
       skills: ["契約・民法・会社法を前提にした事業判断の裏付け", "人事・労務・派遣と事業戦略の整合", "独禁法・会計・財務のリスクを経営会議で説明する視点"],
-      bossHint: "第四の試練：課長の“説明可能な判断”",
-      clearStory: `トレードオフを言葉にできるようになった。\n「次は部長としてのステージです。制度の最前線と、組織を守る設計がございます。引き続きよろしくお願いいたします。」`,
+      bossHint: "最終問題の目安：説明可能な判断（中級中心）",
+      clearStory: `次のステージ（部長）では、サステナ開示・EU 規制など最前線のガバナンスと、組織への落とし込みが中心になります。`,
     },
   },
   {
     id: 5, name: "上級編", role: "部長", questionsPerRun: 5,
     story: {
-      chapter: "第五章　規制の最前線とガバナンス",
-      scene: "法務部長室 — 部長の守備範囲",
-      narrative: `CLOが、ESGとデジタル規制の資料を並べた。
+      chapter: "ステージ5　部長",
+      scene: "株式会社ひろせ — 上級編（規制の最前線とガバナンス）",
+      narrative: `【想定する役割】
+法務部門の責任者層として、開示・デジタル規制・データ統治と、古典的コンプラを同時に設計・説明できること。
 
-「部長としての皆さんのクイズでは、サステナ開示が前面に出ます。CSRDが複数問まとまってお出しします。
-そのうえで、EU AI法、GDPR、高度な契約書審査、個人情報の統治、会社法・民法・独禁法・不競法・労働法まで、ガバナンスの束を一気に扱っていただきます。
-難易度は上級固定でございます。暗記ではなく、説明の筋を通していただければと存じます。」
+【求められる視座・態度】
+制度の変化を、社内プロセス・統制・説明責任に落とし込むこと。暗記ではなく、筋の通った説明を組み立てること。
 
-制度の変化を、組織の仕組みに落とし込むフェーズです。`,
+【主な知識・スキル領域】
+CSRD・サステナ開示、EU AI 法、GDPR、高度な契約書審査、個人情報の統治、会社法・民法・独禁法・不競法・労働法の統合。
+
+【出題の目安】
+難易度は上級。CSRD 等がまとまって出る場合があります。`,
       skills: ["CSRDを中心とした開示・サステナと法務の関与", "EU AI法・GDPR・契約書審査の前沿", "個人情報・会社法・民法・独禁法・不競法・労働法の統合リスク"],
-      bossHint: "第五の試練：CSRD・EU規制・上級ガバナンス（全問ハード）",
-      clearStory: `最前線の論点を、社内の意思決定に接続できた。\n「最後はCLOとしてのステージです。経営と資本市場の両面が問われます。どうぞよろしくお願いいたします。」`,
+      bossHint: "最終問題の目安：CSRD・EU 規制・上級ガバナンス（難易度・ハード）",
+      clearStory: `最終ステージ（CLO）では、経営・資本市場・組織横断を束ねる総合力が中心になります。`,
     },
   },
   {
     id: 6, name: "最終試験", role: "CLO", questionsPerRun: 5,
     story: {
-      chapter: "最終章　経営に接続する法務",
-      scene: "取締役会議室 — CLOとしての総合力",
-      narrative: `議長は、一枚のスライドだけを示した。「最終試練は、知識の幅でございます」。
+      chapter: "ステージ6　CLO（総合）",
+      scene: "株式会社ひろせ — 総合モジュール（経営に接続する法務）",
+      narrative: `【想定する役割】
+最高法務責任者として、デジタル規制・金融規制・個人情報・労務・財務戦略など、経営の歯車全体に法を接続し、一本の方針として示せること。
 
-「CLOのクイズでは、EU AI法が複数問続き、デジタル規制の比重が高くなっております。
-金商法もセットで来ます。一方で、個人情報、派遣・職安、人事・労務、会計・財務・戦略・マネジメント——経営の歯車全部に法が噛み合います。
-難易度は上級固定でございます。バラバラな論点を、一本の方針にお束ねいただけるかどうかが問われます。」
+【求められる視座・態度】
+バラバラな論点を束ね、経営判断と説明責任に耐える論理構造を組み立てること。
 
-経営判断に耐える説明と、組織を守る設計が、ここで最終確認されることになります。`,
+【主な知識・スキル領域】
+EU AI 法、金商法、個人情報、派遣・職安、人事・労務、会計・財務・戦略・マネジメントの統合。
+
+【出題の目安】
+難易度は上級固定。EU AI 法・金商法の比重が高い出題になりがちです。`,
       skills: ["EU AI法と金商法を含む最前線の論点", "個人情報・派遣・職安・人事・労務の組織統治", "会計・財務・戦略・マネジメントと法リスクの統合"],
-      bossHint: "最終試練：AI・金融規制・経営横断（全問ハード）",
+      bossHint: "最終問題の目安：AI・金融規制・経営横断（難易度・ハード）",
       clearStory: null,
     },
   },
@@ -250,11 +275,11 @@ function timeUp() {
   if (!state.reviewMode) {
     if (isBossQuestion()) {
       state.hp = 0;
-      msg = `⏰ 時間切れ！💀 ボス戦敗北 — HP全消滅！\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
+      msg = `⏰ 時間切れです。最終問題のため、このステージは終了し、コンディションは0になりました。\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     } else {
       const damage = 20;
       state.hp = Math.max(0, state.hp - damage);
-      msg = `⏰ 時間切れ！ HP -${damage}\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
+      msg = `⏰ 時間切れです。コンディション -${damage}\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     }
     saveWrongAnswer(q.id);
   } else {
@@ -312,10 +337,10 @@ function showStageIntro() {
   const introScene = document.getElementById("introScene");
   const introNarrative = document.getElementById("introNarrative");
   const introSkillsList = document.getElementById("introSkillsList");
-  const introBossHint = document.getElementById("introBossHint");
+  const introFinalHint = document.getElementById("introFinalHint");
 
   // ストーリー用DOMが無い環境ではイントロをスキップし、同じ呼び出しでクイズへ進める
-  if (!el.stageIntroSection || !introChapter || !introScene || !introNarrative || !introSkillsList || !introBossHint) {
+  if (!el.stageIntroSection || !introChapter || !introScene || !introNarrative || !introSkillsList || !introFinalHint) {
     state.stageIntroPending = false;
     return false;
   }
@@ -324,7 +349,7 @@ function showStageIntro() {
   introScene.textContent = story.scene;
   introNarrative.textContent = story.narrative;
   introSkillsList.innerHTML = story.skills.map(s => `<li>${s}</li>`).join("");
-  introBossHint.textContent = story.bossHint;
+  introFinalHint.textContent = story.bossHint;
   el.quizSection.classList.add("hidden");
   el.resultSection.classList.add("hidden");
   el.stageIntroSection.classList.remove("hidden");
@@ -393,8 +418,8 @@ function renderStageMap() {
   const { maxStageCleared } = getProgress();
   el.stageMapGrid.innerHTML = STAGES.map((s, i) => {
     let cls, status;
-    if (i <= maxStageCleared)            { cls = "cleared";   status = "✅ クリア済"; }
-    else if (i === maxStageCleared + 1)  { cls = "available"; status = "▶ 挑戦可能"; }
+    if (i <= maxStageCleared)            { cls = "cleared";   status = "✅ 修了済"; }
+    else if (i === maxStageCleared + 1)  { cls = "available"; status = "▶ 受講可能"; }
     else                                 { cls = "locked";    status = "🔒"; }
     return `
       <div class="stage-node ${cls}">
@@ -423,7 +448,7 @@ function renderStats() {
   const stats   = getStats();
   const entries = Object.entries(stats).sort((a, b) => b[1].total - a[1].total);
   if (entries.length === 0) {
-    el.statsContent.innerHTML = '<p class="stats-empty">まだデータがありません。プレイすると蓄積されます。</p>';
+    el.statsContent.innerHTML = '<p class="stats-empty">まだデータがありません。研修を進めると蓄積されます。</p>';
     return;
   }
   el.statsContent.innerHTML = entries.map(([theme, { correct, total }]) => {
@@ -504,7 +529,7 @@ function showQuestion() {
 
   if (!state.reviewMode && state.combo >= 2) {
     const mult = comboMultiplier(state.combo);
-    el.comboDisplay.textContent = `🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`;
+    el.comboDisplay.textContent = `連続正解 ${state.combo} ×${mult.toFixed(1)}`;
     el.comboDisplay.classList.remove("hidden");
   } else {
     el.comboDisplay.classList.add("hidden");
@@ -513,7 +538,7 @@ function showQuestion() {
   const isBoss = isBossQuestion();
   el.fatalWarning.classList.toggle("hidden", !isBoss);
   if (isBoss) setTimeout(() => SoundEngine.playFatalWarning(), 300);
-  el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""}${isBoss ? " [⚔️BOSS]" : ""} [${q.theme}] ${q.text}`;
+  el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""}${isBoss ? " [最終問題]" : ""} [${q.theme}] ${q.text}`;
   el.choices.innerHTML = "";
 
   const choiceOrder    = shuffle([...Array(q.choices.length).keys()]);
@@ -571,24 +596,24 @@ function answerQuestion(selected) {
     const bonus   = Math.floor(baseExp * speed);
     state.exp    += gained + bonus;
     state.stageCorrect += 1;
-    msg += `✅ 正解！ EXP +${gained}`;
-    if (state.combo >= 2) { msg += ` 🔥 ${state.combo}コンボ ×${mult.toFixed(1)}`; setTimeout(() => SoundEngine.playCombo(state.combo), 160); }
+    msg += `✅ 正解！ 習熟pt +${gained}`;
+    if (state.combo >= 2) { msg += ` （連続正解 ${state.combo} ×${mult.toFixed(1)}）`; setTimeout(() => SoundEngine.playCombo(state.combo), 160); }
     if (bonus > 0)        msg += ` ⚡ 速答ボーナス +${bonus}`;
     msg += "\n";
     while (state.exp >= state.lv * 50) {
       state.lv += 1;
-      msg += `⬆️ レベルアップ！ LV${state.lv}\n`;
+      msg += `⬆️ 段階が上がりました（段階 ${state.lv}）\n`;
     }
   } else {
     state.combo = 0;
     saveWrongAnswer(q.id);
     if (isBossQuestion()) {
       state.hp = 0;
-      msg += `💀 ボス戦敗北！ HP全消滅！\n`;
+      msg += `最終問題で誤答のため、このステージは終了し、コンディションは0になりました。\n`;
     } else {
         const damage = 20;
       state.hp = Math.max(0, state.hp - damage);
-      msg += `❌ 不正解… HP -${damage}\n`;
+      msg += `❌ 不正解です。コンディション -${damage}\n`;
     }
     msg += `正解: ${q.choices[q.answer]}\n`;
   }
@@ -623,10 +648,10 @@ function handleAfterAnswer(msg, correct) {
     state.gameOver = true;
     const score = calcScore();
     state.totalScore = score;
-    saveRanking(state.name, score, "ゲームオーバー");
+    saveRanking(state.name, score, "セッション終了");
     SoundEngine.stopBgm();
     setTimeout(() => SoundEngine.playGameOver(), 200);
-    msg += `\n\nゲームオーバー。\nスコア: ${score}`;
+    msg += `\n\nセッションはここまでです（コンディション0）。\nスコア: ${score}`;
     el.nextBtn.classList.add("hidden");
     el.restartBtn.classList.remove("hidden");
     setShareText(buildShareTextGameOver(score));
@@ -645,7 +670,7 @@ function handleAfterAnswer(msg, correct) {
       msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n次のステージ: ${STAGES[state.stageIndex + 1].name}`;
-      msg += `\n新役職: ${nextRole} / ヒント +1 獲得`;
+      msg += `\n次の役職ステージ: ${nextRole} / 補助ヒント枠 +1`;
       el.shareBtn.classList.add("hidden");
 
       state.stageIndex += 1;
@@ -670,7 +695,7 @@ function handleAfterAnswer(msg, correct) {
       SoundEngine.stopBgm();
       SoundEngine.playFullClear();
       showStageClearOverlay(STAGES.length, CLEARED_ROLE, grade.label, true);
-      msg += `\n\n——CLOに就任しました。\nあなたの決断と知識が、この会社を守り続けてきた。\n数々の試練を乗り越えたあなたは、今まさに法務の頂点に立つ。`;
+      msg += `\n\n——全ステージを修了し、最終役職としてCLOを想定した評価ラインに到達しました。\n継続的な学習と、実務での検証をおすすめします。`;
       msg += `\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n最終スコア: ${score}`;
@@ -687,7 +712,7 @@ function handleAfterAnswer(msg, correct) {
   if (state.gameOver || state.cleared) {
     el.scoreBanner.classList.remove("hidden");
     el.scoreBanner.classList.toggle("gameover", state.gameOver);
-    el.scoreBannerLabel.textContent = state.gameOver ? "GAME OVER  FINAL SCORE" : "FINAL SCORE";
+    el.scoreBannerLabel.textContent = state.gameOver ? "セッション終了 ／ 総合スコア" : "総合スコア";
     el.scoreBannerValue.textContent = `${state.totalScore} pt`;
   } else {
     el.scoreBanner.classList.add("hidden");
@@ -711,26 +736,26 @@ function setShareText(text) {
 }
 
 function buildShareTextStageClear(stageNum, grade, correct, total) {
-  return `🎮 法務RPG\nStage ${stageNum}「${STAGES[stageNum - 1].name}」クリア！\n評価: ${grade} / 正答率: ${correct}/${total}\n役職: ${STAGES[Math.min(stageNum, STAGES.length - 1)].role}\n#法務RPG`;
+  return `法務クイズ研修\nStage ${stageNum}「${STAGES[stageNum - 1].name}」修了\n評価: ${grade} / 正答率: ${correct}/${total}\n役職ステージ: ${STAGES[Math.min(stageNum, STAGES.length - 1)].role}\n#法務クイズ研修`;
 }
 
 function buildShareTextFullClear(grade, score) {
-  return `🏆 法務RPG 全ステージクリア！\n最終役職: ${CLEARED_ROLE}\n評価: ${grade} / スコア: ${score}pt\n#法務RPG`;
+  return `法務クイズ研修 全ステージ修了\n最終役職ライン: ${CLEARED_ROLE}\n評価: ${grade} / スコア: ${score}pt\n#法務クイズ研修`;
 }
 
 function buildShareTextGameOver(score) {
-  return `🎮 法務RPG\nStage ${state.stageIndex + 1}でゲームオーバー…\nスコア: ${score}pt\nリベンジ挑戦中！ #法務RPG`;
+  return `法務クイズ研修\nStage ${state.stageIndex + 1}でセッション終了\nスコア: ${score}pt\n再チャレンジ歓迎 #法務クイズ研修`;
 }
 
 function buildShareTextReview(correct, total) {
-  return `📚 法務RPG 復習モード\n${correct}/${total}問 正解！ #法務RPG`;
+  return `法務クイズ研修 復習モード\n${correct}/${total}問 正解 #法務クイズ研修`;
 }
 
 // ── ステージクリア演出 ─────────────────────────────
 function showStageClearOverlay(stageNum, newRole, grade, isFinal) {
   const gradeColors = { S: "#fef08a", A: "#bfdbfe", B: "#bbf7d0", C: "#d1d5db" };
-  el.stageClearNum.textContent   = isFinal ? "全ステージクリア！" : `Stage ${stageNum} クリア！`;
-  el.stageClearRole.textContent  = isFinal ? `🏆 ${newRole} に就任！` : `新役職: ${newRole}`;
+  el.stageClearNum.textContent   = isFinal ? "全ステージ修了" : `Stage ${stageNum} 修了`;
+  el.stageClearRole.textContent  = isFinal ? `最終役職ライン: ${newRole}` : `次の役職ステージ: ${newRole}`;
   el.stageClearGrade.textContent = `評価 ${grade}`;
   el.stageClearGrade.style.color = gradeColors[grade] || "#e2e8f0";
   el.stageClearOverlay.classList.remove("hidden");
@@ -742,10 +767,10 @@ function calcGrade(correct, total, hp, startHp) {
   const accuracy = total > 0 ? correct / total : 0;
   const hpRate   = startHp > 0 ? hp / startHp : 0;
   const combined = accuracy * 0.7 + hpRate * 0.3;
-  if (combined >= 0.9) return { label: "S", reason: "完璧な法務判断力" };
-  if (combined >= 0.75) return { label: "A", reason: "優秀な成績" };
-  if (combined >= 0.55) return { label: "B", reason: "合格水準" };
-  return { label: "C", reason: "要復習" };
+  if (combined >= 0.9) return { label: "S", reason: "正答率とコンディションがともに高水準" };
+  if (combined >= 0.75) return { label: "A", reason: "高い理解度" };
+  if (combined >= 0.55) return { label: "B", reason: "達成基準を満たす水準" };
+  return { label: "C", reason: "復習を推奨" };
 }
 
 function calcScore() {
@@ -779,7 +804,7 @@ function startGame() {
     return;
   }
   const name = el.playerName.value.trim();
-  if (!name) { alert("プレイヤー名を入力してください。"); return; }
+  if (!name) { alert("受講者名を入力してください。"); return; }
   Object.assign(state, {
     name, hp: 100, exp: 0, lv: 1,
     stageIndex: 0, current: 0,
@@ -799,7 +824,7 @@ function startReviewMode() {
   if (wrongIds.length === 0) { alert("復習する問題がありません。"); return; }
   const pool = allQuestions.filter(q => wrongIds.includes(q.id));
   if (pool.length === 0) { alert("問題データが見つかりません。"); return; }
-  const name = el.playerName.value.trim() || "プレイヤー";
+  const name = el.playerName.value.trim() || "受講者";
   Object.assign(state, {
     name, reviewMode: true, reviewPool: pool, reviewCorrect: 0,
     current: 0, shuffledIndices: [],

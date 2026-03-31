@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>法務RPG</title>
+    <title>法務クイズ研修</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <main class="container">
-      <h1>法務RPG</h1>
-      <p class="subtitle">新入社員からCLOを目指すクイズRPG</p>
+      <h1>法務クイズ研修</h1>
+      <p class="subtitle">役職ステージで学ぶ法務・コンプラ（新入社員からCLOまで）</p>
 
       <section class="card" id="startSection">
-        <h2>ゲーム開始</h2>
-        <label for="playerName">プレイヤー名</label>
-        <input id="playerName" type="text" placeholder="名前を入力" />
+        <h2>研修の開始</h2>
+        <label for="playerName">受講者名</label>
+        <input id="playerName" type="text" placeholder="受講者名を入力" />
         <div class="start-buttons">
           <button id="startBtn">▶ 開始</button>
           <button id="showRankingBtn" class="btn-secondary">🏆 ランキング</button>
@@ -34,11 +34,11 @@
         <hr class="intro-divider" />
         <p id="introNarrative" class="intro-narrative"></p>
         <div class="intro-skills-wrap">
-          <div class="intro-skills-header">── 習得スキル・知識 ──</div>
+          <div class="intro-skills-header">── 重点スキル・知識 ──</div>
           <ul id="introSkillsList" class="intro-skills-list"></ul>
         </div>
-        <div id="introBossHint" class="intro-boss-hint"></div>
-        <button id="introStartBtn" class="intro-start-btn">⚔️ 冒険を開始する</button>
+        <div id="introFinalHint" class="intro-boss-hint"></div>
+        <button id="introStartBtn" class="intro-start-btn">クイズを開始する</button>
       </section>
 
       <!-- ⑧ ステージマップ -->
@@ -69,9 +69,9 @@
         <div class="status-grid">
           <div>名前: <span id="sName">-</span></div>
           <div>役職: <span id="sRole">-</span></div>
-          <div>LV: <span id="sLv">1</span></div>
-          <div>HP: <span id="sHp">100</span></div>
-          <div>EXP: <span id="sExp">0</span></div>
+          <div>段階: <span id="sLv">1</span></div>
+          <div>コンディション: <span id="sHp">100</span></div>
+          <div>習熟pt: <span id="sExp">0</span></div>
           <div>進行: <span id="sProgress">0/5</span></div>
           <div>ステージ: <span id="sStage">-</span></div>
         </div>
@@ -91,7 +91,7 @@
           <span id="comboDisplay" class="combo-badge hidden"></span>
         </div>
         <div id="fatalWarning" class="fatal-warning hidden">
-          ⚔️ ボス戦 — 不正解・時間切れで即ゲームオーバー！
+          最終問題 — 不正解または時間切れの場合、このステージは終了し、セッションはここまでとなります。
         </div>
         <p id="questionText"></p>
         <div id="choices"></div>
@@ -113,7 +113,7 @@
     <!-- ステージクリア演出 -->
     <div id="stageClearOverlay" class="stage-clear-overlay hidden">
       <div class="stage-clear-box">
-        <div class="stage-clear-title">STAGE CLEAR!</div>
+        <div class="stage-clear-title">ステージ修了</div>
         <div id="stageClearNum" class="stage-clear-num"></div>
         <div id="stageClearRole" class="stage-clear-role"></div>
         <div id="stageClearGrade" class="stage-clear-grade-badge"></div>
