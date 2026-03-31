@@ -3,109 +3,104 @@ const STAGES = [
   {
     id: 1, name: "入門編", role: "新入社員", questionsPerRun: 5,
     story: {
-      chapter: "第一章　法務の扉を開けよ",
-      scene: "株式会社アクシス 法務部 — 入社3日目",
-      narrative: `春の朝。辞令を手に法務部の扉を叩いたあなたを迎えたのは、書類の山と鋭い眼光の田中主任だった。
+      chapter: "第一章　法の素養の土台",
+      scene: "株式会社アクシス 法務部 — 入門オリエンテーション",
+      narrative: `S課長はホワイトボードに分野名を並べた。
 
-「ようこそ、法務部へ。ここは会社を守る最後の砦だ。
-一枚の契約書が会社を救うこともあれば、滅ぼすこともある。
-まず基礎を叩き込む。ついてこい。」
+「新入社員に求めるのは、まず“言葉と枠組み”だ。
+会社法・民法・独禁・個人情報・労働・不競法——どれも入口は狭いが、実務では必ず横断する。
+このステージのクイズは、各分野の基礎と法律用語の感覚を問う。雑に覚えず、線を引いて考えろ。」
 
-法務という名の冒険が、いま始まった。`,
-      skills: ["基本的な契約書の構造と役割", "法律用語と法体系の初歩", "コンプライアンスの心構え"],
-      bossHint: "第一の試練：田中主任による入門試験",
-      clearStory: `「合格だ。筋がいい」\n田中主任が珍しく口角を上げた。\nあなたはアシスタントへと昇格し、次なる依頼の扉が開かれる。`,
+ここからは、知識の地図を頭に描きながら挑む。`,
+      skills: ["会社法・民法の基本的な機関と契約の考え方", "独禁法・不競法の入口（カルテル、営業秘密のイメージ）", "個人情報・労働・派遣のコンプラ意識と用語"],
+      bossHint: "第一の試練：多分野の“入口知識”と用語の確認",
+      clearStory: `基礎の引き出しが揃った。\nS課長は頷いた。「次は、現場の相談に耐える一般社員の視点だ。」`,
     },
   },
   {
-    id: 2, name: "法務基礎", role: "法務アシスタント", questionsPerRun: 5,
+    id: 2, name: "法務基礎", role: "一般社員", questionsPerRun: 5,
     story: {
-      chapter: "第二章　最初の依頼",
-      scene: "第3会議室 — 入社半年後",
-      narrative: `日常業務をこなしていたある朝、営業部の青木課長が息を切らして駆け込んできた。
+      chapter: "第二章　業務と法務の接点",
+      scene: "法務部 — 一般社員としての研修",
+      narrative: `H部長（営業）が、紙ではなく「論点リスト」を机に置いた。
 
-「頼む！ 来週、大口取引先と5000万の契約を結ぶんだ。
-この契約書を全部チェックしてほしい。何かリスクがあれば全部洗い出してくれ。
-失敗したら今期の成績が吹っ飛ぶんだよ！」
+「一般社員の法務には、ドラマはいらない。必要なのは、人事・労務、会計・財務、採用・職安、ときに戦略の話まで、依頼の背後にある制度を説明できることだ。
+このステージでは、部門横断の論点とマネジメント文脈での法の効き方が中心になる。」
 
-一枚の契約書に潜む罠を、あなたは見抜けるか。`,
-      skills: ["契約条項のリスク識別", "表明保証・担保の基礎", "瑕疵担保責任と損害賠償"],
-      bossHint: "第二の試練：契約書の深部に潜む致命条項",
-      clearStory: `すべてのリスク条項を摘出し、取引先との修正交渉も成立。\n青木課長からの熱い握手とともに、あなたの名前は社内に広まり始めた。`,
+現場の言葉と制度の言葉を、同じテーブルに載せられるか。`,
+      skills: ["人事・労務・職安法と採用・派遣の論点整理", "会計・財務・戦略の数字と法リスクの接続", "マネジメント上の意思決定とコンプライアンスのバランス"],
+      bossHint: "第二の試練：部門横断の“業務知×法知”",
+      clearStory: `相談の型が見えてきた。\n「次は係長だ。レビューと優先順位の付け方が試される。」`,
     },
   },
   {
-    id: 3, name: "応用実務", role: "法務担当", questionsPerRun: 5,
+    id: 3, name: "応用実務", role: "係長", questionsPerRun: 5,
     story: {
-      chapter: "第三章　嵐の訴訟",
-      scene: "法務部長室 — ある月曜日の早朝",
-      narrative: `出社するなり部長室に呼ばれた。机の上には一通の内容証明が置かれていた。
+      chapter: "第三章　レビューと横断の実務",
+      scene: "法務部 — 係長としてのスキルセット",
+      narrative: `課長は、積まれた契約書ではなく「チェック観点の一覧」を差し出した。
 
-「準大手の取引先から3億円の損害賠償請求だ。
-製品に瑕疵があったと主張している。
-担当はお前だ——証拠を集め、反論を組み立て、この戦いを制せ。」
+「係長には、条文の読み方だけでなく、取引の型と規制の重なりが要る。
+契約書審査、民法・会社法の実務論点、独禁・金商法の入り口、GDPR——クイズはそこを往復する。
+正解を当てるより、誤った安心を捨てられるか。」
 
-法廷という名のダンジョンが、あなたを待ち受ける。`,
-      skills: ["訴訟の流れと証拠収集の実務", "製品瑕疵と不法行為責任", "和解交渉と費用対効果分析"],
-      bossHint: "第三の試練：相手方弁護士が突きつける決定的証拠",
-      clearStory: `緻密な反証と法的主張が実を結び、請求額の大幅減額で和解成立。\n部長が静かに言った。「本物の法務担当になったな。」`,
+幅と深さの両方で、実務の芯を固める段階だ。`,
+      skills: ["契約書審査（条項の意図とリスクの言語化）", "民法・会社法・独禁法・金商法の実務接点", "GDPR・個人情報の国際対応の基礎"],
+      bossHint: "第三の試練：レビューと規制の“重なり”を問う",
+      clearStory: `論点の優先順位がついた。\n課長は言った。「次は課長だ。チームを動かす前提の知識が要る。」`,
     },
   },
   {
-    id: 4, name: "実践編", role: "シニア法務担当", questionsPerRun: 5,
+    id: 4, name: "実践編", role: "課長", questionsPerRun: 5,
     story: {
-      chapter: "第四章　国境を超えた戦い",
-      scene: "取締役会議室 — M&Aプロジェクト発足",
-      narrative: `訴訟での活躍が評価され、極秘プロジェクトへの参画を命じられた。
+      chapter: "第四章　課としての設計と判断",
+      scene: "法務部 — 課長の意思決定",
+      narrative: `会議室の画面には、事業計画と法務チェックリストが並んだ。
 
-「EU本拠の製造企業を500億で買収する計画だ。
-GDPR対応、独禁法クリアランス、クロスボーダーの契約設計——全部お前が仕切れ。
-競合他社も同じターゲットを狙っている。失敗は許されない。」
+「課長には、契約レビューの速さだけでなく、人事・労務・会計・戦略と法務を同じ時間軸で組み立てる力がいる。
+独禁・会社法・派遣・財務——出題はバラけるが、根っこは“優先順位と説明責任”だ。」
 
-国際法務の荒波の中、あなたの判断力が問われる。`,
-      skills: ["M&Aデューデリジェンスの実務", "GDPRと国際データ保護法", "独占禁止法と競争法対応"],
-      bossHint: "第四の試練：競合による買収阻止の法的妨害工作",
-      clearStory: `デューデリを完遂し、すべての法的障壁をクリア。買収は成立した。\nあなたはシニア担当として、国際案件の第一人者となった。`,
+このステージのクイズは、課のリーダーとしての知識の幅と、判断の言語化を試す。`,
+      skills: ["契約・民法・会社法を前提にした事業判断の裏付け", "人事・労務・派遣と事業戦略の整合", "独禁法・会計・財務のリスクを経営会議で説明する視点"],
+      bossHint: "第四の試練：課長の“説明可能な判断”",
+      clearStory: `トレードオフを言葉にできるようになった。\n「次は部長だ。制度の最前線と、組織を守る設計が待っている。」`,
     },
   },
   {
-    id: 5, name: "上級編", role: "法務リーダー", questionsPerRun: 5,
+    id: 5, name: "上級編", role: "部長", questionsPerRun: 5,
     story: {
-      chapter: "第五章　内側からの嵐",
-      scene: "法務部 — 内部告発から48時間後",
-      narrative: `深夜、匿名の内部告発メールが届いた。経理部で組織的な不正が行われているという。
+      chapter: "第五章　規制の最前線とガバナンス",
+      scene: "法務部長室 — 部長の守備範囲",
+      narrative: `CLOが、ESGとデジタル規制の資料を並べた。
 
-部長が険しい顔で言う。
-「規制当局が動く前に、先手を打つしかない。
-調査チームを率いて全容を解明しろ。
-メディアも当局も、どちらも敵になりうる。」
+「部長には、開示とAIとデータと古典的なコンプラが同時に来る。
+CSRD、EU AI法、GDPR、会社法・個情・労働・独禁——クイズは“最新の論点”と“不変の原則”の両方を混ぜる。
+答えを暗記するな。会社のガバナンスとして筋の通る説明をしろ。」
 
-チームを率いるリーダーとして、あなたの本当の試練が始まる。`,
-      skills: ["内部調査と証拠保全の手法", "コンプライアンスプログラムの設計", "規制当局対応と危機管理"],
-      bossHint: "第五の試練：規制当局による抜き打ち立入検査",
-      clearStory: `全容解明と自主申告により、制裁は最小限に抑えられた。\nリーダーとしての手腕を見せたあなたの前に、最後の扉が開こうとしていた。`,
+制度の変化を、組織の仕組みに落とし込むフェーズだ。`,
+      skills: ["CSRD・サステナ開示と法務の関与", "EU AI法・GDPRを含む越境規制の整理", "会社法・個人情報・労働・独禁の統合的リスク管理"],
+      bossHint: "第五の試練：最前線規制とコーポレートガバナンス",
+      clearStory: `最前線の論点を、社内の意思決定に接続できた。\n「最後はCLOだ。経営と資本市場の両面が問われる。」`,
     },
   },
   {
-    id: 6, name: "最終試験", role: "法務マネージャー", questionsPerRun: 5,
+    id: 6, name: "最終試験", role: "CLO", questionsPerRun: 5,
     story: {
-      chapter: "最終章　法務責任者への試練",
-      scene: "取締役会議室 — 最終選考",
-      narrative: `すべての試練を乗り越えたあなたの前に、議長が静かに立っている。
+      chapter: "最終章　経営に接続する法務",
+      scene: "取締役会議室 — CLOとしての総合力",
+      narrative: `議長は、一枚のスライドだけを示した。「最終試練は、知識の幅だ」。
 
-「次期法務責任者の候補は、あなた一人だ。
-しかしこのポストには、最高水準の法務判断力が求められる。
-今から最終試験を行う。
-合格すれば——この会社の法務を統括する地位が、あなたのものになる。」
+「CLOには、金商法と資本市場、人事と労務、会計と戦略、AIと個人情報——バラバラに見える論点を、一本の方針に束ねる力が要る。
+ドラマはない。あるのは、経営判断に耐える説明と、組織を守る設計だけだ。」
 
-法務冒険の、最後の扉。すべてをここに賭けろ。`,
-      skills: ["経営戦略と法務ガバナンス", "コーポレートガバナンスの実践", "統合リスクマネジメント"],
-      bossHint: "最終ボス：取締役会による法務責任者就任審査",
+このステージのクイズは、これまでの集大成として、横断と優先順位の最終確認となる。`,
+      skills: ["金商法・開示・資本市場と法務の接点", "人事・労務・派遣・職安を含む組織統治", "会計・財務・戦略・マネジメントと法リスクの統合"],
+      bossHint: "最終試練：CLOに求められる横断知識と優先順位",
       clearStory: null,
     },
   },
 ];
-const CLEARED_ROLE  = "法務責任者";
+const CLEARED_ROLE  = "CLO";
 const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
 
 function comboMultiplier(combo) {
@@ -304,18 +299,23 @@ function buildShuffledIndices() {
   }
 }
 
+/** @returns {boolean} ストーリー画面を表示した（この後はユーザーの開始操作待ち） */
 function showStageIntro() {
   const story = STAGES[state.stageIndex].story;
+  if (!story) {
+    state.stageIntroPending = false;
+    return false;
+  }
   const introChapter = document.getElementById("introChapter");
   const introScene = document.getElementById("introScene");
   const introNarrative = document.getElementById("introNarrative");
   const introSkillsList = document.getElementById("introSkillsList");
   const introBossHint = document.getElementById("introBossHint");
 
-  // ストーリー用DOMが無い環境でもゲーム進行を止めない
+  // ストーリー用DOMが無い環境ではイントロをスキップし、同じ呼び出しでクイズへ進める
   if (!el.stageIntroSection || !introChapter || !introScene || !introNarrative || !introSkillsList || !introBossHint) {
     state.stageIntroPending = false;
-    return;
+    return false;
   }
 
   introChapter.textContent = story.chapter;
@@ -326,6 +326,7 @@ function showStageIntro() {
   el.quizSection.classList.add("hidden");
   el.resultSection.classList.add("hidden");
   el.stageIntroSection.classList.remove("hidden");
+  return true;
 }
 
 function isBossQuestion() {
@@ -464,13 +465,34 @@ function showPanel(panelId) {
 // ── 問題表示 ──────────────────────────────────────
 function showQuestion() {
   if (!state.reviewMode && state.stageIntroPending) {
-    showStageIntro();
-    return;
+    const showedIntro = showStageIntro();
+    if (showedIntro) return;
   }
 
   isAnswering = false;
   const qs = getActiveQuestions();
-  const q  = qs[state.shuffledIndices[state.current]];
+  if (!qs.length) {
+    clearTimer();
+    el.quizSection.classList.remove("hidden");
+    el.resultSection.classList.add("hidden");
+    if (el.questionText) {
+      el.questionText.textContent = "このステージに出題できる問題がありません。questions.json を確認してください。";
+    }
+    if (el.choices) el.choices.innerHTML = "";
+    return;
+  }
+  if (!state.shuffledIndices || state.shuffledIndices.length === 0) buildShuffledIndices();
+  if (state.current >= state.shuffledIndices.length) state.current = 0;
+  const q = qs[state.shuffledIndices[state.current]];
+  if (!q) {
+    clearTimer();
+    el.quizSection.classList.remove("hidden");
+    if (el.questionText) {
+      el.questionText.textContent = "問題の読み込みに失敗しました。ページを再読み込みするか、セーブを消してやり直してください。";
+    }
+    if (el.choices) el.choices.innerHTML = "";
+    return;
+  }
 
   el.quizSection.classList.remove("hidden");
   el.resultSection.classList.add("hidden");
@@ -646,7 +668,7 @@ function handleAfterAnswer(msg, correct) {
       SoundEngine.stopBgm();
       SoundEngine.playFullClear();
       showStageClearOverlay(STAGES.length, CLEARED_ROLE, grade.label, true);
-      msg += `\n\n——法務責任者に就任しました。\nあなたの決断と知識が、この会社を守り続けてきた。\n数々の試練を乗り越えたあなたは、今まさに法務の頂点に立つ。`;
+      msg += `\n\n——CLOに就任しました。\nあなたの決断と知識が、この会社を守り続けてきた。\n数々の試練を乗り越えたあなたは、今まさに法務の頂点に立つ。`;
       msg += `\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
       msg += `\n最終スコア: ${score}`;

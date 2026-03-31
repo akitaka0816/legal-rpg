@@ -781,6 +781,15 @@ button:hover {
   line-height: 1.7;
 }
 
+/* クイズカードはダーク背景のため、本文色を明示（環境・拡張機能での視認性低下を防ぐ） */
+#quizSection {
+  color: #e2e8f0;
+}
+
+#quizSection #questionText {
+  color: #f8fafc;
+}
+
 #choices {
   margin-top: 10px;
 }
