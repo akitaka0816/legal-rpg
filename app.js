@@ -496,7 +496,10 @@ function showPanel(panelId) {
 function showQuestion() {
   if (!state.reviewMode && state.stageIntroPending) {
     const showedIntro = showStageIntro();
-    if (showedIntro) return;
+    if (showedIntro) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
   }
 
   isAnswering = false;
