@@ -11,7 +11,7 @@
     "image-rendering:pixelated;image-rendering:crisp-edges;";
   document.body.insertBefore(canvas, document.body.firstChild);
 
-  const ctx = canvas.getContext("2d");
+  let ctx = canvas.getContext("2d");
   ctx.imageSmoothingEnabled = false;
 
   // ── ヘルパー ────────────────────────────────────
@@ -227,16 +227,32 @@
     });
   }
 
-  // ── アニメーションループ ─────────────────────────
-  function draw(t) {
+  // ── 静的要素キャッシュ（空・月・山・木・城は毎フレーム同一） ──
+  const staticCanvas = document.createElement("canvas");
+  staticCanvas.width = W;
+  staticCanvas.height = H;
+  const staticCtx = staticCanvas.getContext("2d");
+
+  function buildStaticCache() {
+    const origCtx = ctx;
+    // 一時的に ctx を差し替えて既存描画関数を流用
+    ctx = staticCtx;
     ctx.clearRect(0, 0, W, H);
     drawSky();
     drawMoon(252, 22);
-    drawStars(t);
-    drawClouds(t);
     drawMountains();
     drawTrees();
     drawCastle();
+    ctx = origCtx;
+  }
+  buildStaticCache();
+
+  // ── アニメーションループ ─────────────────────────
+  function draw(t) {
+    // 静的レイヤーを一括転写（個別描画の6関数呼び出しを1回のdrawImageに削減）
+    ctx.drawImage(staticCanvas, 0, 0);
+    drawStars(t);
+    drawClouds(t);
     drawFireflies(t);
     requestAnimationFrame(draw);
   }

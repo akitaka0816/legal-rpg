@@ -224,6 +224,11 @@ const el = {
   stageClearNum:     document.getElementById("stageClearNum"),
   stageClearRole:    document.getElementById("stageClearRole"),
   stageClearGrade:   document.getElementById("stageClearGrade"),
+  introChapter:      document.getElementById("introChapter"),
+  introScene:        document.getElementById("introScene"),
+  introNarrative:    document.getElementById("introNarrative"),
+  introSkillsList:   document.getElementById("introSkillsList"),
+  introFinalHint:    document.getElementById("introFinalHint"),
 };
 
 // 初期状態は問題読み込み待ち
@@ -298,9 +303,12 @@ function highlightChoices(selectedDisplayIdx) {
 }
 
 // ── 問題管理 ──────────────────────────────────────
+let _stageQCache = { index: -1, questions: [] };
 function getStageQuestions() {
+  if (_stageQCache.index === state.stageIndex) return _stageQCache.questions;
   const stageId = STAGES[state.stageIndex].id;
-  return allQuestions.filter(q => q.stage === stageId);
+  _stageQCache = { index: state.stageIndex, questions: allQuestions.filter(q => q.stage === stageId) };
+  return _stageQCache.questions;
 }
 
 function getActiveQuestions() {
@@ -333,23 +341,18 @@ function showStageIntro() {
     state.stageIntroPending = false;
     return false;
   }
-  const introChapter = document.getElementById("introChapter");
-  const introScene = document.getElementById("introScene");
-  const introNarrative = document.getElementById("introNarrative");
-  const introSkillsList = document.getElementById("introSkillsList");
-  const introFinalHint = document.getElementById("introFinalHint");
 
   // ストーリー用DOMが無い環境ではイントロをスキップし、同じ呼び出しでクイズへ進める
-  if (!el.stageIntroSection || !introChapter || !introScene || !introNarrative || !introSkillsList || !introFinalHint) {
+  if (!el.stageIntroSection || !el.introChapter || !el.introScene || !el.introNarrative || !el.introSkillsList || !el.introFinalHint) {
     state.stageIntroPending = false;
     return false;
   }
 
-  introChapter.textContent = story.chapter;
-  introScene.textContent = story.scene;
-  introNarrative.textContent = story.narrative;
-  introSkillsList.innerHTML = story.skills.map(s => `<li>${s}</li>`).join("");
-  introFinalHint.textContent = story.bossHint;
+  el.introChapter.textContent = story.chapter;
+  el.introScene.textContent = story.scene;
+  el.introNarrative.textContent = story.narrative;
+  el.introSkillsList.innerHTML = story.skills.map(s => `<li>${s}</li>`).join("");
+  el.introFinalHint.textContent = story.bossHint;
   el.quizSection.classList.add("hidden");
   el.resultSection.classList.add("hidden");
   el.stageIntroSection.classList.remove("hidden");
@@ -544,13 +547,15 @@ function showQuestion() {
   const choiceOrder    = shuffle([...Array(q.choices.length).keys()]);
   currentCorrectIdx    = choiceOrder.indexOf(q.answer);
 
+  const frag = document.createDocumentFragment();
   choiceOrder.forEach((origIdx, displayIdx) => {
     const b = document.createElement("button");
     b.className   = "choice-btn";
     b.textContent = `${displayIdx + 1}. ${q.choices[origIdx]}`;
     b.addEventListener("click", () => answerQuestion(displayIdx));
-    el.choices.appendChild(b);
+    frag.appendChild(b);
   });
+  el.choices.appendChild(frag);
 
   startTimer();
   saveState();

@@ -37,6 +37,7 @@ const SoundEngine = (() => {
     g.gain.linearRampToValueAtTime(0, c.currentTime + startOffset + dur);
     osc.start(c.currentTime + startOffset);
     osc.stop(c.currentTime + startOffset + dur + 0.01);
+    osc.onended = () => { osc.disconnect(); g.disconnect(); };
   }
 
   // 和音
@@ -148,11 +149,12 @@ const SoundEngine = (() => {
 
   function scheduleBgmLoop(offsetSec) {
     const c = getCtx();
-    let bgmOut = c.createGain();
+    const bgmOut = c.createGain();
     bgmOut.gain.setValueAtTime(0.18, c.currentTime);
     bgmOut.connect(masterGain);
 
     let t = offsetSec;
+    let lastEndTime = 0;
     bgmSequence.forEach(([freq, beats]) => {
       const dur = beats * BGM_BEAT;
       if (!muted) {
@@ -167,10 +169,16 @@ const SoundEngine = (() => {
         g.gain.setValueAtTime(1, c.currentTime + t + dur - 0.04);
         g.gain.linearRampToValueAtTime(0, c.currentTime + t + dur);
         osc.start(c.currentTime + t);
-        osc.stop(c.currentTime + t + dur + 0.01);
+        const endTime = c.currentTime + t + dur + 0.01;
+        osc.stop(endTime);
+        if (endTime > lastEndTime) lastEndTime = endTime;
+        // 停止後にノードを切断してメモリを解放
+        osc.onended = () => { osc.disconnect(); g.disconnect(); };
       }
       t += dur;
     });
+    // ループ全体終了後に bgmOut も切断
+    setTimeout(() => bgmOut.disconnect(), (t + 0.5) * 1000);
     return t; // ループ全体の長さ(秒)
   }
 
