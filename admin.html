@@ -51,12 +51,6 @@
   .q-meta { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
   .badge { font-size: 10px; padding: 1px 5px; border-radius: 3px; background: #0f3460; color: #aac; }
   .badge.stage { background: #1a3020; color: #6c6; }
-  .badge.diff-1 { background: #1a2a1a; color: #8d8; }
-  .badge.diff-2 { background: #2a2a1a; color: #dd8; }
-  .badge.diff-3 { background: #2a1a1a; color: #d88; }
-  .badge.diff-4 { background: #2a1520; color: #e8a0c8; }
-  .badge.diff-5 { background: #251a2a; color: #c8a8ff; }
-  .badge.diff-6 { background: #1a1528; color: #ffcc88; }
   .sidebar-footer { padding: 8px 12px; border-top: 1px solid #0f3460; font-size: 12px; color: #666; }
 
   /* 編集パネル */
@@ -149,15 +143,6 @@
           <select class="filter" id="filter-theme" onchange="renderList()">
             <option value="">全テーマ</option>
           </select>
-          <select class="filter" id="filter-diff" onchange="renderList()">
-            <option value="">全難易度</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
         </div>
       </div>
       <div id="q-list"></div>
@@ -182,15 +167,9 @@
       <label>テーマ</label>
       <input type="text" id="new-theme" placeholder="会社法">
     </div>
-    <div class="form-row" style="display:flex;gap:12px;">
-      <div style="flex:1">
-        <label>ステージ</label>
-        <input type="text" id="new-stage" placeholder="1">
-      </div>
-      <div style="flex:1">
-        <label>難易度 (1〜6)</label>
-        <input type="text" id="new-diff" placeholder="1">
-      </div>
+    <div class="form-row">
+      <label>ステージ（1〜6）</label>
+      <input type="text" id="new-stage" placeholder="1">
     </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeAddModal()">キャンセル</button>
@@ -269,14 +248,12 @@ function renderList() {
   const q = document.getElementById('search').value.toLowerCase();
   const stage = document.getElementById('filter-stage').value;
   const theme = document.getElementById('filter-theme').value;
-  const diff = document.getElementById('filter-diff').value;
 
   filteredIndices = [];
   questions.forEach((item, i) => {
     if (q && !item.text?.toLowerCase().includes(q) && !item.theme?.toLowerCase().includes(q) && !item.id?.toLowerCase().includes(q)) return;
     if (stage && String(item.stage) !== stage) return;
     if (theme && item.theme !== theme) return;
-    if (diff && String(item.difficulty) !== diff) return;
     filteredIndices.push(i);
   });
 
@@ -285,9 +262,6 @@ function renderList() {
     const item = questions[i];
     const isActive = i === currentIndex ? 'active' : '';
     const isMod = modifiedSet.has(i) ? 'modified' : '';
-    const dRaw = Number(item.difficulty);
-    const d = Number.isFinite(dRaw) && dRaw >= 1 && dRaw <= 6 ? Math.round(dRaw) : 1;
-    const stars = '★'.repeat(d);
     return `<div class="q-item ${isActive} ${isMod}" onclick="selectQuestion(${i})">
       <div style="flex:1">
         <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">
@@ -297,7 +271,6 @@ function renderList() {
         <div class="q-preview">${escHtml(item.text || '')}</div>
         <div class="q-meta">
           <span class="badge stage">S${item.stage}</span>
-          <span class="badge diff-${d}">${stars}</span>
           <span class="badge">${escHtml(item.theme || '')}</span>
         </div>
       </div>
@@ -354,12 +327,8 @@ function renderForm(i) {
           <input type="text" id="f-theme" value="${escAttr(q.theme||'')}">
         </div>
         <div class="form-row">
-          <label>ステージ</label>
+          <label>ステージ（1〜6）</label>
           <input type="text" id="f-stage" value="${escAttr(String(q.stage??''))}">
-        </div>
-        <div class="form-row">
-          <label>難易度 (1〜6)</label>
-          <input type="text" id="f-difficulty" value="${escAttr(String(q.difficulty??''))}">
         </div>
       </div>
       <div class="form-row">
@@ -413,24 +382,17 @@ function flushCurrentEdits() {
 function saveCurrentEdits(i, silent) {
   const q = questions[i];
   const get = id => { const el = document.getElementById(id); return el ? el.value : null; };
-  const { hint: _omitHint, ...qNoHint } = q;
+  const { hint: _omitHint, difficulty: _omitDiff, ...qNoHint } = q;
 
   const newChoices = [0,1,2,3].map(ci => get(`choice-${ci}`) ?? (q.choices||[])[ci] ?? '');
   const answerEl = document.querySelector('input[name="answer"]:checked');
   const newAnswer = answerEl ? parseInt(answerEl.value) : q.answer;
 
-  const stageVal = parseInt(get('f-stage'), 10) || q.stage || 1;
-  const rawDiff = parseInt(get('f-difficulty'), 10);
-  const clampedDiff = Number.isFinite(rawDiff)
-    ? Math.max(1, Math.min(6, rawDiff))
-    : Math.max(1, Math.min(6, Number(q.difficulty) || stageVal));
-
   const newQ = {
     ...qNoHint,
     id: get('f-id') ?? q.id,
     theme: get('f-theme') ?? q.theme,
-    stage: parseInt(get('f-stage')) || q.stage,
-    difficulty: clampedDiff,
+    stage: Math.max(1, Math.min(6, parseInt(get('f-stage'), 10) || q.stage || 1)),
     text: get('f-text') ?? q.text,
     choices: newChoices,
     answer: newAnswer,
@@ -511,7 +473,6 @@ function addQuestion() {
   document.getElementById('new-id').value = suggestNextId();
   document.getElementById('new-theme').value = '';
   document.getElementById('new-stage').value = '1';
-  document.getElementById('new-diff').value = '1';
 }
 
 function closeAddModal() {
@@ -522,13 +483,11 @@ function confirmAddQuestion() {
   const id = document.getElementById('new-id').value.trim();
   const theme = document.getElementById('new-theme').value.trim();
   const stage = Math.max(1, Math.min(6, parseInt(document.getElementById('new-stage').value, 10) || 1));
-  const rawD = parseInt(document.getElementById('new-diff').value, 10);
-  const diff = Number.isFinite(rawD) ? Math.max(1, Math.min(6, rawD)) : stage;
   if (!id) { alert('IDを入力してください'); return; }
   if (questions.some(q => q.id === id)) { alert('このIDは既に存在します'); return; }
 
   const newQ = {
-    id, theme, difficulty: diff, tags: [],
+    id, theme, tags: [],
     text: '', choices: ['', '', '', ''], answer: 0,
     explanation: '', stage, fatal: false
   };
@@ -552,9 +511,9 @@ function downloadJSON() {
       selectQuestion(idx);
       return;
     }
-    const dv = Number(qq.difficulty);
-    if (!Number.isFinite(dv) || dv < 1 || dv > 6) {
-      alert(`問題 ${qq.id}: 難易度は 1〜6 の整数にしてください（現在: ${qq.difficulty}）。`);
+    const st = Number(qq.stage);
+    if (!Number.isFinite(st) || st < 1 || st > 6) {
+      alert(`問題 ${qq.id}: ステージは 1〜6 の整数にしてください（現在: ${qq.stage}）。`);
       selectQuestion(idx);
       return;
     }

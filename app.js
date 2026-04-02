@@ -15,9 +15,9 @@ const STAGES = [
 法律用語の整理、会社法・民法・独禁法・不競法の入口、労働法・派遣法・職安法の前提、個人情報保護の基本線。
 
 【出題の目安】
-データ上の difficulty は主に 1（入門相当）。上記を横断して問う場合があります。`,
+入門相当の論点を中心に、上記を横断して問う場合があります。`,
       skills: ["法律用語と論点の整理", "会社法・民法・独禁法・不競法の基礎概念", "労働法・派遣法・職安法と個人情報の入門"],
-      bossHint: "最終問題の目安：用語と多分野の入口（difficulty 1 相当）",
+      bossHint: "最終問題の目安：用語と多分野の入口（入門）",
       clearStory: `次のステージ（一般社員）では、部門横断の相談に耐えるための業務知と法知の接続が中心になります。`,
     },
   },
@@ -36,9 +36,9 @@ const STAGES = [
 個人情報保護法、職安法、法律用語の再確認、会計・財務・人事・労務・戦略と法リスクの接続、マネジメント用語（KPI 等）とコンプラの関係。
 
 【出題の目安】
-データ上の difficulty は主に 2（基礎中心。一部ステップアップあり）。論点の種類が増えます。`,
+基礎中心（一部ステップアップあり）。論点の種類が増えます。`,
       skills: ["人事・労務・職安法と採用・派遣の論点整理", "会計・財務・戦略の数字と法リスクの接続", "マネジメント上の意思決定とコンプライアンスのバランス"],
-      bossHint: "最終問題の目安：部門横断の業務知と法知（difficulty 2 相当）",
+      bossHint: "最終問題の目安：部門横断の業務知と法知（基礎）",
       clearStory: `次のステージ（係長）では、契約書審査を中心に、複数法分野を横断した実務判断が中心になります。`,
     },
   },
@@ -57,9 +57,9 @@ const STAGES = [
 契約書審査、会社法・民法・独禁法・不競法、金商法の入り口、会計論点、GDPR・個人情報の実務。
 
 【出題の目安】
-データ上の difficulty は主に 3。横断出題になります。`,
+中級相当の横断出題になります。`,
       skills: ["契約書審査（条項の意図とリスクの言語化）", "会社法・民法・独禁法・不競法・金商法の実務接点", "個人情報・GDPRと会計論点の整理"],
-      bossHint: "最終問題の目安：契約レビューと横断法分野（difficulty 3 相当）",
+      bossHint: "最終問題の目安：契約レビューと横断法分野（中級）",
       clearStory: `次のステージ（課長）では、チームや部門をまたいだ説明責任と、優先順位に基づく判断の言語化が中心になります。`,
     },
   },
@@ -78,9 +78,9 @@ const STAGES = [
 契約・民法・会社法、人事・労務・派遣、会計・財務・戦略、独禁法、個人情報・GDPR などの横断。
 
 【出題の目安】
-データ上の difficulty は主に 4（中級中心。一部は 5）。知識の幅と判断の言語化を問います。`,
+中級〜実務寄りの論点。知識の幅と判断の言語化を問います。`,
       skills: ["契約・民法・会社法を前提にした事業判断の裏付け", "人事・労務・派遣と事業戦略の整合", "独禁法・会計・財務のリスクを経営会議で説明する視点"],
-      bossHint: "最終問題の目安：説明可能な判断（difficulty 4〜5 相当）",
+      bossHint: "最終問題の目安：説明可能な判断（中級〜実務）",
       clearStory: `次のステージ（部長）では、サステナ開示・EU 規制など最前線のガバナンスと、組織への落とし込みが中心になります。`,
     },
   },
@@ -99,9 +99,9 @@ const STAGES = [
 CSRD・サステナ開示、EU AI 法、GDPR、高度な契約書審査、個人情報の統治、会社法・民法・独禁法・不競法・労働法の統合。
 
 【出題の目安】
-データ上の difficulty は主に 5（上級）。CSRD 等がまとまって出る場合があります。`,
+上級相当。CSRD 等がまとまって出る場合があります。`,
       skills: ["CSRDを中心とした開示・サステナと法務の関与", "EU AI法・GDPR・契約書審査の前沿", "個人情報・会社法・民法・独禁法・不競法・労働法の統合リスク"],
-      bossHint: "最終問題の目安：CSRD・EU 規制・上級ガバナンス（difficulty 5 相当）",
+      bossHint: "最終問題の目安：CSRD・EU 規制・上級ガバナンス",
       clearStory: `最終ステージ（CLO）では、経営・資本市場・組織横断を束ねる総合力が中心になります。`,
     },
   },
@@ -120,23 +120,15 @@ CSRD・サステナ開示、EU AI 法、GDPR、高度な契約書審査、個人
 EU AI 法、金商法、個人情報、派遣・職安、人事・労務、会計・財務・戦略・マネジメントの統合。
 
 【出題の目安】
-データ上の difficulty は主に 6（最上級）。EU AI 法・金商法の比重が高い出題になりがちです。`,
+最上級ライン。EU AI 法・金商法の比重が高い出題になりがちです。`,
       skills: ["EU AI法と金商法を含む最前線の論点", "個人情報・派遣・職安・人事・労務の組織統治", "会計・財務・戦略・マネジメントと法リスクの統合"],
-      bossHint: "最終問題の目安：AI・金融規制・経営横断（difficulty 6 相当）",
+      bossHint: "最終問題の目安：AI・金融規制・経営横断（総合）",
       clearStory: null,
     },
   },
 ];
 const CLEARED_ROLE  = "CLO";
 const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
-
-/** questions.json の difficulty（1〜6）。未設定や範囲外はステージ番号にフォールバック */
-function questionDifficulty(q) {
-  const n = Number(q?.difficulty);
-  if (Number.isFinite(n) && n >= 1 && n <= 6) return Math.round(n);
-  const fallback = state.stageIndex + 1;
-  return Math.max(1, Math.min(6, fallback));
-}
 
 function comboMultiplier(combo) {
   if (combo >= 4) return 2.5;
@@ -600,11 +592,8 @@ function answerQuestion(selected) {
     const mult    = comboMultiplier(state.combo);
     const speed   = speedBonus(timerRemaining);
     const baseExp = EXP_PER_STAGE[state.stageIndex] ?? 10;
-    const d       = questionDifficulty(q);
-    const stageNum = state.stageIndex + 1;
-    const diffAlign = Math.min(1.15, Math.max(0.85, d / stageNum));
-    const gained  = Math.floor(baseExp * mult * diffAlign);
-    const bonus   = Math.floor(baseExp * speed * diffAlign);
+    const gained  = Math.floor(baseExp * mult);
+    const bonus   = Math.floor(baseExp * speed);
     state.exp    += gained + bonus;
     state.stageCorrect += 1;
     msg += `✅ 正解！ 習熟pt +${gained}`;
