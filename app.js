@@ -308,7 +308,7 @@ function getCurrentStages() {
 const CLEARED_ROLE  = "CLO";
 const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
 // Google Apps Script（Webアプリ）のURLを貼り付け（空の場合は送信ボタンを非表示）
-const RESULT_POST_URL = "";
+const RESULT_POST_URL = "https://script.google.com/macros/s/AKfycbwXuLpidNTJWLHTuauADQ2YxjIAyi_G-deOa_7PIO-yaVIfnYETWJstD6N2uP18tImb/exec";
 
 function comboMultiplier(combo) {
   if (combo >= 4) return 2.5;
