@@ -137,6 +137,9 @@
       <div id="sidebar-header">
         <input type="text" id="search" placeholder="問題文・テーマで検索..." oninput="renderList()">
         <div class="filter-row">
+          <select class="filter" id="filter-course" onchange="renderList()">
+            <option value="">全コース</option>
+          </select>
           <select class="filter" id="filter-stage" onchange="renderList()">
             <option value="">全ステージ</option>
           </select>
@@ -159,6 +162,10 @@
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
     <h3>問題を追加</h3>
+    <div class="form-row">
+      <label>コース（空=総合 / 例: ppc）</label>
+      <input type="text" id="new-course" placeholder="">
+    </div>
     <div class="form-row">
       <label>ID（例: q101）</label>
       <input type="text" id="new-id" placeholder="q101">
@@ -186,6 +193,7 @@ let filteredIndices = [];
 let currentIndex = null;
 let modifiedSet = new Set();
 let pendingChanges = {};
+const DEFAULT_COURSE = 'general';
 
 // ---- ファイル読み込み ----
 const dropZone = document.getElementById('drop-zone');
@@ -235,10 +243,17 @@ function reloadFile() {
 
 // ---- フィルター ----
 function populateFilters() {
+  const courses = [...new Set(questions.map(q => q.course || DEFAULT_COURSE))].sort();
   const stages = [...new Set(questions.map(q => q.stage).filter(s => s != null))].sort((a,b)=>a-b);
   const themes = [...new Set(questions.map(q => q.theme).filter(Boolean))].sort();
+  const courseEl = document.getElementById('filter-course');
   const stageEl = document.getElementById('filter-stage');
   const themeEl = document.getElementById('filter-theme');
+  if (courseEl) {
+    courseEl.innerHTML =
+      '<option value="">全コース</option>' +
+      courses.map(c => `<option value="${escAttr(c)}">${escHtml(c)}</option>`).join('');
+  }
   stageEl.innerHTML = '<option value="">全ステージ</option>' + stages.map(s => `<option value="${s}">ステージ${s}</option>`).join('');
   themeEl.innerHTML = '<option value="">全テーマ</option>' + themes.map(t => `<option value="${t}">${t}</option>`).join('');
 }
@@ -246,11 +261,13 @@ function populateFilters() {
 // ---- リスト描画 ----
 function renderList() {
   const q = document.getElementById('search').value.toLowerCase();
+  const course = document.getElementById('filter-course')?.value;
   const stage = document.getElementById('filter-stage').value;
   const theme = document.getElementById('filter-theme').value;
 
   filteredIndices = [];
   questions.forEach((item, i) => {
+    if (course && String(item.course || DEFAULT_COURSE) !== course) return;
     if (q && !item.text?.toLowerCase().includes(q) && !item.theme?.toLowerCase().includes(q) && !item.id?.toLowerCase().includes(q)) return;
     if (stage && String(item.stage) !== stage) return;
     if (theme && item.theme !== theme) return;
@@ -262,6 +279,7 @@ function renderList() {
     const item = questions[i];
     const isActive = i === currentIndex ? 'active' : '';
     const isMod = modifiedSet.has(i) ? 'modified' : '';
+    const courseId = String(item.course || DEFAULT_COURSE);
     return `<div class="q-item ${isActive} ${isMod}" onclick="selectQuestion(${i})">
       <div style="flex:1">
         <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">
@@ -270,6 +288,7 @@ function renderList() {
         </div>
         <div class="q-preview">${escHtml(item.text || '')}</div>
         <div class="q-meta">
+          <span class="badge">${escHtml(courseId)}</span>
           <span class="badge stage">S${item.stage}</span>
           <span class="badge">${escHtml(item.theme || '')}</span>
         </div>
@@ -325,6 +344,10 @@ function renderForm(i) {
         <div class="form-row">
           <label>テーマ</label>
           <input type="text" id="f-theme" value="${escAttr(q.theme||'')}">
+        </div>
+        <div class="form-row">
+          <label>コース（空=総合 / 例: ppc）</label>
+          <input type="text" id="f-course" value="${escAttr(String(q.course||''))}">
         </div>
         <div class="form-row">
           <label>ステージ（1〜6）</label>
@@ -388,10 +411,14 @@ function saveCurrentEdits(i, silent) {
   const answerEl = document.querySelector('input[name="answer"]:checked');
   const newAnswer = answerEl ? parseInt(answerEl.value) : q.answer;
 
+  const rawCourse = String(get('f-course') ?? q.course ?? '').trim();
+  const courseVal = rawCourse === '' || rawCourse === DEFAULT_COURSE ? undefined : rawCourse;
+
   const newQ = {
     ...qNoHint,
     id: get('f-id') ?? q.id,
     theme: get('f-theme') ?? q.theme,
+    ...(courseVal ? { course: courseVal } : {}),
     stage: Math.max(1, Math.min(6, parseInt(get('f-stage'), 10) || q.stage || 1)),
     text: get('f-text') ?? q.text,
     choices: newChoices,
@@ -470,6 +497,7 @@ function suggestNextId() {
 
 function addQuestion() {
   document.getElementById('add-modal').classList.add('open');
+  document.getElementById('new-course').value = '';
   document.getElementById('new-id').value = suggestNextId();
   document.getElementById('new-theme').value = '';
   document.getElementById('new-stage').value = '1';
@@ -480,6 +508,8 @@ function closeAddModal() {
 }
 
 function confirmAddQuestion() {
+  const rawCourse = String(document.getElementById('new-course').value || '').trim();
+  const courseVal = rawCourse === '' || rawCourse === DEFAULT_COURSE ? undefined : rawCourse;
   const id = document.getElementById('new-id').value.trim();
   const theme = document.getElementById('new-theme').value.trim();
   const stage = Math.max(1, Math.min(6, parseInt(document.getElementById('new-stage').value, 10) || 1));
@@ -487,7 +517,7 @@ function confirmAddQuestion() {
   if (questions.some(q => q.id === id)) { alert('このIDは既に存在します'); return; }
 
   const newQ = {
-    id, theme, tags: [],
+    id, theme, ...(courseVal ? { course: courseVal } : {}), tags: [],
     text: '', choices: ['', '', '', ''], answer: 0,
     explanation: '', stage, fatal: false
   };
@@ -516,6 +546,19 @@ function downloadJSON() {
       alert(`問題 ${qq.id}: ステージは 1〜6 の整数にしてください（現在: ${qq.stage}）。`);
       selectQuestion(idx);
       return;
+    }
+    if (qq.course != null) {
+      const c = String(qq.course).trim();
+      if (!c) {
+        alert(`問題 ${qq.id}: course は空文字にせず、未指定（削除）またはID（例: ppc）にしてください。`);
+        selectQuestion(idx);
+        return;
+      }
+      if (c === DEFAULT_COURSE) {
+        alert(`問題 ${qq.id}: 総合コースは course を未指定（削除）にしてください（${DEFAULT_COURSE} の明示指定は不要）。`);
+        selectQuestion(idx);
+        return;
+      }
     }
   }
   const blob = new Blob([JSON.stringify(questions, null, 2)], { type: 'application/json' });
