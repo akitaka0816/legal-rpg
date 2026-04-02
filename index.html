@@ -11,8 +11,16 @@
       <h1>法務クイズ研修</h1>
       <p class="subtitle">役職ステージで学ぶ法務・コンプラ（新入社員からCLOまで）</p>
 
-      <section class="card" id="startSection">
+      <!-- コース選択 -->
+      <section class="card" id="courseSelectSection">
+        <h2>コースを選択</h2>
+        <div id="courseGrid" class="course-grid"></div>
+      </section>
+
+      <!-- 開始（コース選択後に表示） -->
+      <section class="card hidden" id="startSection">
         <h2>研修の開始</h2>
+        <button id="backToCourseBtn" class="btn-secondary btn-back">← コース選択に戻る</button>
         <label for="playerName">受講者名</label>
         <input id="playerName" type="text" placeholder="受講者名を入力" />
         <div class="start-buttons">
