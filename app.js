@@ -307,6 +307,8 @@ function getCurrentStages() {
 
 const CLEARED_ROLE  = "CLO";
 const EXP_PER_STAGE = [10, 15, 20, 30, 40, 50];
+// Google Apps Script（Webアプリ）のURLを貼り付け（空の場合は送信ボタンを非表示）
+const RESULT_POST_URL = "";
 
 function comboMultiplier(combo) {
   if (combo >= 4) return 2.5;
@@ -354,6 +356,7 @@ const state = {
   stageIntroPending: false,
   shuffledIndices: [],
   stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
+  sessionCorrect: 0, sessionTotal: 0,
   reviewMode: false, reviewPool: [], reviewCorrect: 0,
 };
 
@@ -394,6 +397,7 @@ const el = {
   resultText:    document.getElementById("resultText"),
   nextBtn:       document.getElementById("nextBtn"),
   restartBtn:    document.getElementById("restartBtn"),
+  sendBtn:       document.getElementById("sendBtn"),
   shareBtn:      document.getElementById("shareBtn"),
   scoreBanner:      document.getElementById("scoreBanner"),
   scoreBannerLabel: document.getElementById("scoreBannerLabel"),
@@ -452,6 +456,7 @@ function timeUp() {
   updateStats(q.theme, false);
   let msg = "";
   if (!state.reviewMode) {
+    state.sessionTotal += 1;
     if (isBossQuestion()) {
       state.hp = 0;
       msg = `⏰ 時間切れです。最終問題のため、このステージは終了し、コンディションは0になりました。\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
@@ -768,7 +773,9 @@ function answerQuestion(selected) {
     return;
   }
 
+  state.sessionTotal += 1;
   if (correct) {
+    state.sessionCorrect += 1;
     state.combo += 1;
     const mult    = comboMultiplier(state.combo);
     const speed   = speedBonus(timerRemaining);
@@ -908,6 +915,12 @@ function finishResult(msg) {
   el.quizSection.classList.add("hidden");
   el.resultSection.classList.remove("hidden");
   el.resultText.textContent = msg;
+  if (el.sendBtn) {
+    const canSend = Boolean(RESULT_POST_URL) && !state.reviewMode && (state.gameOver || state.cleared);
+    el.sendBtn.classList.toggle("hidden", !canSend);
+    el.sendBtn.disabled = false;
+    el.sendBtn.textContent = "📝 結果を送信";
+  }
 }
 
 // ── ③ シェア ──────────────────────────────────────
@@ -930,6 +943,43 @@ function buildShareTextGameOver(score) {
 
 function buildShareTextReview(correct, total) {
   return `法務クイズ研修 復習モード\n${correct}/${total}問 正解 #法務クイズ研修`;
+}
+
+// ── 結果送信（Google Apps Script）────────────────────
+function buildResultPayload() {
+  const now = new Date();
+  const course = getCurrentCourse();
+  const reachedStage = state.cleared ? getCurrentStages().length : (state.stageIndex + 1);
+  const total = Number(state.sessionTotal) || 0;
+  const correct = Number(state.sessionCorrect) || 0;
+  const rate = total > 0 ? correct / total : 0;
+  return {
+    name: state.name,
+    courseId: state.courseId ?? "general",
+    courseName: course?.name ?? "",
+    reachedStage,
+    score: state.totalScore || calcScore(),
+    accuracy: {
+      correct,
+      total,
+      rate,
+      percent: Math.round(rate * 1000) / 10,
+    },
+    timestamp: now.toISOString(),
+  };
+}
+
+async function postResultToGas(payload) {
+  if (!RESULT_POST_URL) throw new Error("RESULT_POST_URL が未設定です");
+  // GitHub Pages -> Apps Script は CORS で詰まりやすいため no-cors で投げる（応答は読めない）
+  await fetch(RESULT_POST_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload),
+    mode: "no-cors",
+    cache: "no-store",
+  });
+  return null;
 }
 
 // ── ステージクリア演出 ─────────────────────────────
@@ -994,6 +1044,7 @@ function startGame() {
     stageIntroPending: true,
     shuffledIndices: [],
     stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
+    sessionCorrect: 0, sessionTotal: 0,
     reviewMode: false, reviewPool: [], reviewCorrect: 0,
   });
   buildShuffledIndices();
@@ -1151,6 +1202,26 @@ el.shareBtn.addEventListener("click", () => {
     setTimeout(() => { el.shareBtn.textContent = "📋 結果をコピー"; el.shareBtn.classList.remove("copied"); }, 2000);
   }).catch(() => { prompt("以下のテキストをコピーしてください：", text); });
 });
+
+if (el.sendBtn) {
+  el.sendBtn.addEventListener("click", async () => {
+    try {
+      el.sendBtn.disabled = true;
+      el.sendBtn.textContent = "送信中...";
+      const payload = buildResultPayload();
+      await postResultToGas(payload);
+      el.sendBtn.textContent = "送信しました";
+      setTimeout(() => {
+        el.sendBtn.textContent = "📝 結果を送信";
+        el.sendBtn.disabled = false;
+      }, 2500);
+    } catch (e) {
+      el.sendBtn.disabled = false;
+      el.sendBtn.textContent = "📝 結果を送信";
+      alert(`結果送信に失敗しました。\n${e?.message || e}`);
+    }
+  });
+}
 
 // ── データ読み込み ─────────────────────────────────
 fetch("questions.json")
