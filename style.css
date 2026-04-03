@@ -1010,3 +1010,175 @@ button:hover {
   margin-bottom: 12px;
   font-size: 0.85rem;
 }
+
+/* ── ヘッダーアクセントライン ───────────────────── */
+.subtitle {
+  padding-bottom: 20px;
+  border-bottom: 2px solid transparent;
+  border-image: linear-gradient(90deg, var(--primary) 0%, var(--accent-info) 50%, transparent 100%) 1;
+  margin-bottom: 4px;
+}
+
+/* ── 問題番号バッジ ─────────────────────────────── */
+.quiz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+
+.quiz-header h2 {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.question-badge {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-light);
+  border: 1.5px solid #bfdbfe;
+  border-radius: 20px;
+  padding: 4px 14px;
+  letter-spacing: 0.04em;
+}
+
+/* ── ステータス進行バー ──────────────────────────── */
+.status-progress-wrap {
+  margin-top: 12px;
+  background: var(--border);
+  border-radius: 6px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.status-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--primary), var(--accent-info));
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+/* ── コースカード カラーバリアント ──────────────── */
+.course-card-icon {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.course-card--blue {
+  border-left: 4px solid var(--primary);
+}
+
+.course-card--blue:hover {
+  border-left-color: var(--primary-hover);
+}
+
+.course-card--green {
+  border-left: 4px solid #16a34a;
+}
+
+.course-card--green:hover {
+  border-left-color: #15803d;
+}
+
+/* ── 解説ブロック ────────────────────────────────── */
+.explanation-block {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #f0f6ff;
+  border-left: 3px solid var(--primary);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.93rem;
+  color: var(--text-main);
+  line-height: 1.75;
+  white-space: pre-line;
+}
+
+/* ── 結果グレードバッジ ──────────────────────────── */
+.result-grade-badge {
+  text-align: center;
+  font-size: 3.5rem;
+  font-weight: 800;
+  padding: 16px 0 8px;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.result-grade-badge.grade-S { color: #d97706; }
+.result-grade-badge.grade-A { color: var(--primary); }
+.result-grade-badge.grade-B { color: #16a34a; }
+.result-grade-badge.grade-C { color: #64748b; }
+
+/* ── ステージマップ タイムライン ─────────────────── */
+.stage-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.stage-tl-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.stage-tl-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  padding-top: 14px;
+}
+
+.stage-tl-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.stage-tl-dot.cleared   { background: #16a34a; border-color: #16a34a; }
+.stage-tl-dot.available { background: var(--primary); border-color: var(--primary); }
+.stage-tl-dot.locked    { background: #e2e8f0; border-color: var(--border); }
+
+.stage-tl-line {
+  width: 2px;
+  flex: 1;
+  min-height: 16px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+.stage-tl-content {
+  flex: 1;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+}
+
+.stage-tl-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.stage-tl-status.cleared   { color: #16a34a; }
+.stage-tl-status.available { color: var(--primary); }
+.stage-tl-status.locked    { color: #94a3b8; }
+
+/* stage-node の margin-bottom を timeline 内で上書き */
+.stage-timeline .stage-node {
+  margin-bottom: 0;
+}
+
+/* モバイル: stage map timeline はそのまま */
+@media (max-width: 640px) {
+  .stage-timeline {
+    gap: 0;
+  }
+}

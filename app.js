@@ -407,6 +407,10 @@ const el = {
   stageClearNum:     document.getElementById("stageClearNum"),
   stageClearRole:    document.getElementById("stageClearRole"),
   stageClearGrade:   document.getElementById("stageClearGrade"),
+  questionBadge:     document.getElementById("questionBadge"),
+  statusProgressBar: document.getElementById("statusProgressBar"),
+  explanationBlock:  document.getElementById("explanationBlock"),
+  resultGradeBadge:  document.getElementById("resultGradeBadge"),
 };
 
 // 初期状態は問題読み込み待ち
@@ -602,17 +606,25 @@ function updateProgress(clearedStageIndex) {
 
 function renderStageMap() {
   const { maxStageCleared } = getProgress();
-  el.stageMapGrid.innerHTML = getCurrentStages().map((s, i) => {
-    let cls, status;
-    if (i <= maxStageCleared)            { cls = "cleared";   status = "✅ 修了済"; }
-    else if (i === maxStageCleared + 1)  { cls = "available"; status = "▶ 受講可能"; }
-    else                                 { cls = "locked";    status = "🔒"; }
+  const stages = getCurrentStages();
+  el.stageMapGrid.innerHTML = stages.map((s, i) => {
+    let cls, statusText, statusIcon;
+    if (i <= maxStageCleared)            { cls = "cleared";   statusText = "修了済"; statusIcon = "✅"; }
+    else if (i === maxStageCleared + 1)  { cls = "available"; statusText = "受講可能"; statusIcon = "▶"; }
+    else                                 { cls = "locked";    statusText = "ロック中"; statusIcon = "🔒"; }
+    const isLast = i === stages.length - 1;
     return `
-      <div class="stage-node ${cls}">
-        <div class="stage-node-num">Stage ${i + 1}</div>
-        <div class="stage-node-name">${s.name}</div>
-        <div class="stage-node-role">${s.role}</div>
-        <div class="stage-node-status">${status}</div>
+      <div class="stage-tl-row">
+        <div class="stage-tl-left">
+          <div class="stage-tl-dot ${cls}"></div>
+          ${!isLast ? '<div class="stage-tl-line"></div>' : ''}
+        </div>
+        <div class="stage-tl-content stage-node ${cls}">
+          <div class="stage-node-num">Stage ${i + 1}</div>
+          <div class="stage-node-name">${s.name}</div>
+          <div class="stage-node-role">${s.role}</div>
+          <div class="stage-tl-status ${cls}">${statusIcon} ${statusText}</div>
+        </div>
       </div>`;
   }).join("");
 }
@@ -663,6 +675,11 @@ function updateStatus() {
   el.sStage.textContent    = state.reviewMode
     ? "復習モード"
     : `Stage ${state.stageIndex + 1}/${getCurrentStages().length} ${getCurrentStages()[state.stageIndex].name}`;
+  if (el.statusProgressBar) {
+    const perRun = state.shuffledIndices.length || getCurrentStages()[state.stageIndex].questionsPerRun;
+    const pct = perRun > 0 ? Math.min(state.current, perRun) / perRun * 100 : 0;
+    el.statusProgressBar.style.width = pct + "%";
+  }
 }
 
 // ── パネル切替 ────────────────────────────────────
@@ -724,6 +741,11 @@ function showQuestion() {
   const isBoss = isBossQuestion();
   el.fatalWarning.classList.toggle("hidden", !isBoss);
   if (isBoss) setTimeout(() => SoundEngine.playFatalWarning(), 300);
+  if (el.questionBadge) {
+    const perRun = state.shuffledIndices.length;
+    el.questionBadge.textContent = `問 ${state.current + 1} / ${perRun}`;
+    el.questionBadge.classList.remove("hidden");
+  }
   el.questionText.textContent = `Q${state.current + 1}${state.reviewMode ? " [復習]" : ""}${isBoss ? " [最終問題]" : ""} [${q.theme}] ${q.text}`;
   el.choices.innerHTML = "";
 
@@ -828,6 +850,7 @@ function handleAfterAnswer(msg, correct) {
       el.shareBtn.classList.add("hidden");
     }
     el.scoreBanner.classList.add("hidden");
+    if (el.resultGradeBadge) el.resultGradeBadge.className = "result-grade-badge hidden";
     finishResult(msg);
     return;
   }
@@ -843,6 +866,7 @@ function handleAfterAnswer(msg, correct) {
     el.nextBtn.classList.add("hidden");
     el.restartBtn.classList.remove("hidden");
     setShareText(buildShareTextGameOver(score));
+    if (el.resultGradeBadge) el.resultGradeBadge.className = "result-grade-badge hidden";
 
   } else if (state.current >= perRun) {
     const grade = calcGrade(state.stageCorrect, state.stageTotal, state.hp, state.stageStartHp);
@@ -870,6 +894,10 @@ function handleAfterAnswer(msg, correct) {
       state.stageStartHp = state.hp;
       state.stageIntroPending = true;
       buildShuffledIndices();
+      if (el.resultGradeBadge) {
+        el.resultGradeBadge.textContent = grade.label;
+        el.resultGradeBadge.className = `result-grade-badge grade-${grade.label}`;
+      }
       el.nextBtn.textContent = "次のステージを開始";
       el.nextBtn.classList.remove("hidden");
       el.restartBtn.classList.add("hidden");
@@ -890,11 +918,16 @@ function handleAfterAnswer(msg, correct) {
       el.nextBtn.classList.add("hidden");
       el.restartBtn.classList.remove("hidden");
       setShareText(buildShareTextFullClear(grade.label, score));
+      if (el.resultGradeBadge) {
+        el.resultGradeBadge.textContent = grade.label;
+        el.resultGradeBadge.className = `result-grade-badge grade-${grade.label}`;
+      }
     }
   } else {
     el.nextBtn.classList.remove("hidden");
     el.restartBtn.classList.add("hidden");
     el.shareBtn.classList.add("hidden");
+    if (el.resultGradeBadge) el.resultGradeBadge.className = "result-grade-badge hidden";
   }
 
   if (state.gameOver || state.cleared) {
@@ -914,7 +947,20 @@ function finishResult(msg) {
   updateStatus();
   el.quizSection.classList.add("hidden");
   el.resultSection.classList.remove("hidden");
-  el.resultText.textContent = msg;
+  const explMarker = "解説: ";
+  const explIdx = msg.lastIndexOf(explMarker);
+  if (el.explanationBlock) {
+    if (explIdx !== -1) {
+      el.resultText.textContent = msg.slice(0, explIdx).replace(/\n+$/, "");
+      el.explanationBlock.textContent = msg.slice(explIdx + explMarker.length);
+      el.explanationBlock.classList.remove("hidden");
+    } else {
+      el.resultText.textContent = msg;
+      el.explanationBlock.classList.add("hidden");
+    }
+  } else {
+    el.resultText.textContent = msg;
+  }
   if (el.sendBtn) {
     const canSend = Boolean(RESULT_POST_URL) && !state.reviewMode && (state.gameOver || state.cleared);
     el.sendBtn.classList.toggle("hidden", !canSend);
@@ -1093,12 +1139,19 @@ function showCourseSelect() {
   if (!section) return;
   const grid = document.getElementById("courseGrid");
   if (grid) {
-    grid.innerHTML = COURSES.map(c => `
-      <div class="course-card" data-course-id="${c.id}">
-        <div class="course-card-name">${c.name}</div>
-        <div class="course-card-desc">${c.description}</div>
-      </div>
-    `).join("");
+    const COURSE_META = {
+      general: { icon: "⚖️", colorClass: "course-card--blue" },
+      ppc:     { icon: "🛡️", colorClass: "course-card--green" },
+    };
+    grid.innerHTML = COURSES.map(c => {
+      const meta = COURSE_META[c.id] || { icon: "📚", colorClass: "" };
+      return `
+        <div class="course-card ${meta.colorClass}" data-course-id="${c.id}">
+          <div class="course-card-icon">${meta.icon}</div>
+          <div class="course-card-name">${c.name}</div>
+          <div class="course-card-desc">${c.description}</div>
+        </div>`;
+    }).join("");
     grid.querySelectorAll(".course-card").forEach(card => {
       card.addEventListener("click", () => selectCourse(card.dataset.courseId));
     });

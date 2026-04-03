@@ -52,7 +52,7 @@
       <!-- ⑧ ステージマップ -->
       <section class="card hidden" id="stageMapSection">
         <h2>📍 ステージマップ</h2>
-        <div id="stageMapGrid" class="stage-map-grid"></div>
+        <div id="stageMapGrid" class="stage-map-grid stage-timeline"></div>
         <button class="btn-secondary panel-close-btn" data-close-panel>← トップへ戻る</button>
       </section>
 
@@ -85,6 +85,9 @@
             <div>進行: <span id="sProgress">0/5</span></div>
             <div>ステージ: <span id="sStage">-</span></div>
           </div>
+          <div class="status-progress-wrap">
+            <div id="statusProgressBar" class="status-progress-bar"></div>
+          </div>
           <div class="achievement-wrap">
             <div class="achievement-title">実績</div>
             <div id="achievementList" class="achievement-list">未獲得</div>
@@ -93,7 +96,10 @@
 
         <div class="quiz-main">
           <section class="card hidden" id="quizSection">
-            <h2>クイズ</h2>
+            <div class="quiz-header">
+              <h2>クイズ</h2>
+              <div id="questionBadge" class="question-badge hidden"></div>
+            </div>
             <div class="timer-wrap">
               <div class="timer-bar-bg">
                 <div id="timerBar" class="timer-bar"></div>
@@ -114,7 +120,9 @@
               <div id="scoreBannerLabel" class="score-banner-label"></div>
               <div id="scoreBannerValue" class="score-banner-value"></div>
             </div>
+            <div id="resultGradeBadge" class="result-grade-badge hidden"></div>
             <p id="resultText"></p>
+            <div id="explanationBlock" class="explanation-block hidden"></div>
             <button id="nextBtn">次へ</button>
             <button id="restartBtn" class="hidden">最初から</button>
             <button id="sendBtn" class="btn-secondary hidden">📝 結果を送信</button>
