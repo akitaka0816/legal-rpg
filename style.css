@@ -914,6 +914,60 @@ button:hover {
 }
 
 
+/* ── クイズ中レイアウト（左ステータス ＋ 右クイズ） ── */
+.quiz-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+/* 左：ステータスパネル（縦一列・固定幅） */
+#statusSection {
+  width: 210px;
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.quiz-layout #statusSection .status-grid {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.quiz-layout #statusSection .status-grid > div {
+  font-size: 0.86rem;
+  padding: 8px 10px;
+}
+
+/* 右：クイズ・結果エリア（余白を広く） */
+.quiz-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.quiz-main > .card {
+  margin-top: 0;
+}
+
+.quiz-main > .card + .card {
+  margin-top: 16px;
+}
+
+/* モバイルでは縦積みに戻す */
+@media (max-width: 700px) {
+  .quiz-layout {
+    flex-direction: column;
+  }
+
+  #statusSection {
+    width: 100%;
+  }
+
+  .quiz-layout #statusSection .status-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* ── コース選択 ─────────────────────────────────── */
 .course-grid {
   display: grid;
