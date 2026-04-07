@@ -87,6 +87,40 @@ h1 {
   border-bottom: 1.5px solid var(--border);
 }
 
+/* ── キャラクターアバター ────────────────────────── */
+.character-avatar-wrap {
+  text-align: center;
+  padding: 14px 10px 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: #f8fafc;
+  margin-bottom: 12px;
+  transition: background 0.45s ease, border-color 0.45s ease;
+}
+
+.avatar-icon {
+  font-size: 2.6rem;
+  line-height: 1;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.avatar-role-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition: color 0.45s ease;
+}
+
+.avatar-pop {
+  animation: avatarPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes avatarPop {
+  from { transform: scale(0.82); opacity: 0.5; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
 /* ── ステータス / 結果 ──────────────────────────── */
 #statusSection,
 #resultSection {
