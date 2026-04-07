@@ -456,11 +456,11 @@ function timeUp() {
   SoundEngine.playTimeUp();
   const q = getActiveQuestions()[state.shuffledIndices[state.current]];
   highlightChoices(-1);
-  state.stageTotal += 1;
   state.combo = 0;
-  updateStats(q.theme, false);
   let msg = "";
   if (!state.reviewMode) {
+    state.stageTotal += 1;
+    updateStats(q.theme, false);
     state.sessionTotal += 1;
     if (isBossQuestion()) {
       state.hp = 0;
@@ -775,8 +775,6 @@ function answerQuestion(selected) {
   const q       = getActiveQuestions()[state.shuffledIndices[state.current]];
   const correct = selected === currentCorrectIdx;
   highlightChoices(selected);
-  updateStats(q.theme, correct);
-  state.stageTotal += 1;
   let msg = "";
 
   if (correct) SoundEngine.playCorrect();
@@ -797,6 +795,8 @@ function answerQuestion(selected) {
     return;
   }
 
+  updateStats(q.theme, correct);
+  state.stageTotal += 1;
   state.sessionTotal += 1;
   if (correct) {
     state.sessionCorrect += 1;
