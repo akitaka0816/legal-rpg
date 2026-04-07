@@ -358,6 +358,7 @@ const state = {
   stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
   sessionCorrect: 0, sessionTotal: 0,
   reviewMode: false, reviewPool: [], reviewCorrect: 0,
+  stageMaxCombo: 0, stageExpBefore: 0,
 };
 
 const el = {
@@ -740,6 +741,7 @@ function showQuestion() {
 
   const isBoss = isBossQuestion();
   el.fatalWarning.classList.toggle("hidden", !isBoss);
+  el.quizSection.classList.toggle("boss-mode", isBoss && !state.reviewMode);
   if (isBoss) setTimeout(() => SoundEngine.playFatalWarning(), 300);
   if (el.questionBadge) {
     const perRun = state.shuffledIndices.length;
@@ -799,6 +801,7 @@ function answerQuestion(selected) {
   if (correct) {
     state.sessionCorrect += 1;
     state.combo += 1;
+    state.stageMaxCombo = Math.max(state.stageMaxCombo, state.combo);
     const mult    = comboMultiplier(state.combo);
     const speed   = speedBonus(timerRemaining);
     const baseExp = EXP_PER_STAGE[state.stageIndex] ?? 10;
@@ -877,7 +880,13 @@ function handleAfterAnswer(msg, correct) {
       const nextRole     = getCurrentStages()[state.stageIndex + 1].role;
       updateProgress(clearedIdx);
       SoundEngine.playStageClear();
-      showStageClearOverlay(clearedIdx + 1, nextRole, grade.label, false);
+      const clearStats = {
+        correct: state.stageCorrect,
+        total: state.stageTotal,
+        expGained: state.exp - state.stageExpBefore,
+        maxCombo: state.stageMaxCombo,
+      };
+      showStageClearOverlay(clearedIdx + 1, nextRole, grade.label, false, clearStats);
       if (clearedStage.story?.clearStory) msg += `\n\n${clearedStage.story.clearStory}`;
       msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
@@ -889,6 +898,8 @@ function handleAfterAnswer(msg, correct) {
       state.current = 0;
 
       state.combo   = 0;
+      state.stageMaxCombo = 0;
+      state.stageExpBefore = state.exp;
       state.stageCorrect = 0;
       state.stageTotal   = 0;
       state.stageStartHp = state.hp;
@@ -910,7 +921,13 @@ function handleAfterAnswer(msg, correct) {
       saveRanking(state.name, score, grade.label);
       SoundEngine.stopBgm();
       SoundEngine.playFullClear();
-      showStageClearOverlay(getCurrentStages().length, CLEARED_ROLE, grade.label, true);
+      const finalClearStats = {
+        correct: state.stageCorrect,
+        total: state.stageTotal,
+        expGained: state.exp - state.stageExpBefore,
+        maxCombo: state.stageMaxCombo,
+      };
+      showStageClearOverlay(getCurrentStages().length, CLEARED_ROLE, grade.label, true, finalClearStats);
       msg += `\n\n——全ステージを修了し、最終役職としてCLOを想定した評価ラインに到達しました。\n継続的な学習と、実務での検証をおすすめします。`;
       msg += `\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
@@ -943,6 +960,13 @@ function handleAfterAnswer(msg, correct) {
   saveState();
 }
 
+function highlightExplanation(text) {
+  const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return escaped
+    .replace(/「([^」]+)」/g, '「<strong class="expl-kw">$1</strong>」')
+    .replace(/\n/g, "<br>");
+}
+
 function finishResult(msg) {
   updateStatus();
   el.quizSection.classList.add("hidden");
@@ -952,7 +976,9 @@ function finishResult(msg) {
   if (el.explanationBlock) {
     if (explIdx !== -1) {
       el.resultText.textContent = msg.slice(0, explIdx).replace(/\n+$/, "");
-      el.explanationBlock.textContent = msg.slice(explIdx + explMarker.length);
+      el.explanationBlock.classList.add("hidden");
+      el.explanationBlock.innerHTML = highlightExplanation(msg.slice(explIdx + explMarker.length));
+      void el.explanationBlock.offsetHeight; // reflow to re-trigger animation
       el.explanationBlock.classList.remove("hidden");
     } else {
       el.resultText.textContent = msg;
@@ -1029,14 +1055,25 @@ async function postResultToGas(payload) {
 }
 
 // ── ステージクリア演出 ─────────────────────────────
-function showStageClearOverlay(stageNum, newRole, grade, isFinal) {
+function showStageClearOverlay(stageNum, newRole, grade, isFinal, stats = null) {
   const gradeColors = { S: "#fef08a", A: "#bfdbfe", B: "#bbf7d0", C: "#d1d5db" };
   el.stageClearNum.textContent   = isFinal ? "全ステージ修了" : `Stage ${stageNum} 修了`;
   el.stageClearRole.textContent  = isFinal ? `最終役職ライン: ${newRole}` : `次の役職ステージ: ${newRole}`;
   el.stageClearGrade.textContent = `評価 ${grade}`;
   el.stageClearGrade.style.color = gradeColors[grade] || "#e2e8f0";
+  const statsEl = document.getElementById("stageClearStats");
+  if (statsEl && stats) {
+    const acc = stats.total > 0 ? Math.round(stats.correct / stats.total * 100) : 0;
+    statsEl.innerHTML =
+      `<div class="stage-clear-stat"><strong>${stats.correct}/${stats.total}</strong>問正解 (${acc}%)</div>` +
+      `<div class="stage-clear-stat">習熟pt <strong>+${stats.expGained}</strong></div>` +
+      (stats.maxCombo >= 2 ? `<div class="stage-clear-stat">最大コンボ <strong>${stats.maxCombo}</strong></div>` : "");
+    statsEl.classList.remove("hidden");
+  } else if (statsEl) {
+    statsEl.classList.add("hidden");
+  }
   el.stageClearOverlay.classList.remove("hidden");
-  setTimeout(() => el.stageClearOverlay.classList.add("hidden"), 2800);
+  setTimeout(() => el.stageClearOverlay.classList.add("hidden"), 3400);
 }
 
 // ── 評価・スコア ───────────────────────────────────
@@ -1092,6 +1129,7 @@ function startGame() {
     stageCorrect: 0, stageTotal: 0, stageStartHp: 100, totalScore: 0,
     sessionCorrect: 0, sessionTotal: 0,
     reviewMode: false, reviewPool: [], reviewCorrect: 0,
+    stageMaxCombo: 0, stageExpBefore: 0,
   });
   buildShuffledIndices();
   showGameUI();

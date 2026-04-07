@@ -305,6 +305,22 @@ button:hover {
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
+/* ── ボス問モード ───────────────────────────────── */
+#quizSection.boss-mode {
+  border-color: #fca5a5;
+  background: linear-gradient(160deg, #fff5f5 0%, #fff8f8 100%);
+  animation: bossGlow 1.4s ease-in-out infinite alternate;
+}
+
+#quizSection.boss-mode #questionText {
+  color: #7f1d1d;
+}
+
+@keyframes bossGlow {
+  from { box-shadow: 0 0 0 2px rgba(239,68,68,0.10), var(--shadow); }
+  to   { box-shadow: 0 0 0 4px rgba(239,68,68,0.22), var(--shadow-md); }
+}
+
 /* 最終問題警告 */
 .fatal-warning {
   background: #fff5f5;
@@ -425,6 +441,28 @@ button:hover {
   background: #f8fafc;
   border: 2px solid var(--border);
   color: var(--text-strong);
+}
+
+.stage-clear-stats {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.stage-clear-stat {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 0.85rem;
+  color: var(--text-sub);
+}
+
+.stage-clear-stat strong {
+  color: var(--primary);
+  font-weight: 700;
 }
 
 @keyframes fadeIn {
@@ -1094,7 +1132,23 @@ button:hover {
   font-size: 0.93rem;
   color: var(--text-main);
   line-height: 1.75;
-  white-space: pre-line;
+}
+
+.explanation-block:not(.hidden) {
+  animation: fadeSlideIn 0.35s ease;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.expl-kw {
+  color: var(--primary);
+  font-weight: 700;
+  background: #eff4ff;
+  padding: 0 2px;
+  border-radius: 3px;
 }
 
 /* ── 結果グレードバッジ ──────────────────────────── */
