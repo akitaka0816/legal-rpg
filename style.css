@@ -1156,6 +1156,14 @@ button:hover {
   border-left-color: #15803d;
 }
 
+.course-card--orange {
+  border-left: 4px solid #ea580c;
+}
+
+.course-card--orange:hover {
+  border-left-color: #c2410c;
+}
+
 /* ── 解説ブロック ────────────────────────────────── */
 .explanation-block {
   margin-top: 12px;

@@ -17,6 +17,13 @@
         <div id="courseGrid" class="course-grid"></div>
       </section>
 
+      <!-- システム概要リンク -->
+      <div style="text-align:right; margin-top:6px;">
+        <a href="about.html" target="_blank" style="font-size:0.82rem; color:var(--text-sub); text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:6px; transition:background 0.15s;" onmouseover="this.style.background='var(--primary-light)'" onmouseout="this.style.background=''">
+          📄 システム概要・よくある質問
+        </a>
+      </div>
+
       <!-- 開始（コース選択後に表示） -->
       <section class="card hidden" id="startSection">
         <h2>研修の開始</h2>
@@ -94,7 +101,6 @@
               <div class="intro-skills-header">── 重点スキル・知識 ──</div>
               <ul id="introSkillsList" class="intro-skills-list"></ul>
             </div>
-            <div id="introFinalHint" class="intro-boss-hint"></div>
             <button id="introStartBtn" class="intro-start-btn">クイズを開始する</button>
           </section>
 
