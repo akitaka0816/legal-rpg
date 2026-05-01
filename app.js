@@ -338,6 +338,16 @@ const ROLE_AVATARS = {
   "CLO":      { icon: "⚖️",  bg: "#fef9c3", border: "#f59e0b", text: "#92400e" },
 };
 
+// ステージごとのボス情報（最終問題で出現）
+const BOSS_DATA = [
+  { icon: "📜", name: "新人最終確認・試問者" },
+  { icon: "📋", name: "現場相談・最終判定官" },
+  { icon: "📑", name: "契約レビュー試問者" },
+  { icon: "⚔️", name: "経営会議の試金石" },
+  { icon: "🏛️", name: "ガバナンスの審判者" },
+  { icon: "👑", name: "最高法務責任者試験" },
+];
+
 let _lastAvatarRole = null;
 
 function updateCharacterAvatar() {
@@ -474,6 +484,19 @@ const el = {
   statusProgressBar: document.getElementById("statusProgressBar"),
   explanationBlock:  document.getElementById("explanationBlock"),
   resultGradeBadge:  document.getElementById("resultGradeBadge"),
+  bossBattle:        document.getElementById("bossBattle"),
+  bossAvatar:        document.getElementById("bossAvatar"),
+  bossIcon:          document.getElementById("bossIcon"),
+  bossName:          document.getElementById("bossName"),
+  bossHpBar:         document.getElementById("bossHpBar"),
+  bossHpText:        document.getElementById("bossHpText"),
+  battleEffect:      document.getElementById("battleEffect"),
+  battleResultBadge: document.getElementById("battleResultBadge"),
+  evolutionStage:    document.getElementById("evolutionStage"),
+  evolutionFromIcon: document.getElementById("evolutionFromIcon"),
+  evolutionFromName: document.getElementById("evolutionFromName"),
+  evolutionToIcon:   document.getElementById("evolutionToIcon"),
+  evolutionToName:   document.getElementById("evolutionToName"),
 };
 
 // 初期状態は問題読み込み待ち
@@ -526,6 +549,7 @@ function timeUp() {
     state.sessionTotal += 1;
     if (isBossQuestion()) {
       state.hp = 0;
+      animateBossAttack();
       msg = `⏰ 時間切れです。最終問題のため、このステージは終了し、コンディションは0になりました。\n正解: ${q.choices[q.answer]}\n解説: ${q.explanation}`;
     } else {
       const damage = 20;
@@ -609,6 +633,71 @@ function showStageIntro() {
 function isBossQuestion() {
   if (state.reviewMode) return false;
   return state.current === getCurrentStages()[state.stageIndex].questionsPerRun - 1;
+}
+
+// ── ボス戦演出 ────────────────────────────────────
+function showBossPanel() {
+  if (!el.bossBattle) return;
+  const boss = BOSS_DATA[state.stageIndex] || { icon: "👹", name: "最終試問" };
+  el.bossIcon.textContent = boss.icon;
+  el.bossName.textContent = `Stage ${state.stageIndex + 1} BOSS — ${boss.name}`;
+  el.bossHpBar.style.width = "100%";
+  el.bossHpText.textContent = "HP 100 / 100";
+  el.bossAvatar.classList.remove("boss-shake");
+  el.bossBattle.classList.remove("boss-defeated");
+  el.bossBattle.classList.remove("hidden");
+  el.battleEffect.className = "battle-effect";
+  el.battleResultBadge.className = "battle-result-badge hidden";
+  el.battleResultBadge.textContent = "";
+}
+
+function hideBossPanel() {
+  if (!el.bossBattle) return;
+  el.bossBattle.classList.add("hidden");
+}
+
+function triggerBattleEffect(kind) {
+  if (!el.battleEffect) return;
+  el.battleEffect.className = "battle-effect";
+  void el.battleEffect.offsetHeight;
+  el.battleEffect.classList.add(kind);
+}
+
+function showBattleResultBadge(kind, label) {
+  if (!el.battleResultBadge) return;
+  el.battleResultBadge.textContent = label;
+  el.battleResultBadge.className = `battle-result-badge ${kind}`;
+}
+
+function animateBossDefeat() {
+  if (!el.bossBattle) return;
+  triggerBattleEffect("slash");
+  setTimeout(() => {
+    triggerBattleEffect("flash");
+    el.bossHpBar.style.width = "0%";
+    el.bossHpText.textContent = "HP 0 / 100";
+    el.bossAvatar.classList.add("boss-shake");
+    setTimeout(() => {
+      el.bossBattle.classList.add("boss-defeated");
+      showBattleResultBadge("victory", "撃破！");
+    }, 320);
+  }, 220);
+}
+
+function animateBossAttack() {
+  if (!el.bossBattle) return;
+  triggerBattleEffect("boss-hit");
+  el.bossAvatar.classList.add("boss-shake");
+  if (el.quizSection) {
+    el.quizSection.classList.remove("player-hit");
+    void el.quizSection.offsetHeight;
+    el.quizSection.classList.add("player-hit");
+    setTimeout(() => el.quizSection.classList.remove("player-hit"), 500);
+  }
+  setTimeout(() => {
+    el.bossAvatar.classList.remove("boss-shake");
+    showBattleResultBadge("defeat", "被弾…");
+  }, 320);
 }
 
 function currentRole() {
@@ -802,7 +891,12 @@ function showQuestion() {
   const isBoss = isBossQuestion();
   el.fatalWarning.classList.toggle("hidden", !isBoss);
   el.quizSection.classList.toggle("boss-mode", isBoss && !state.reviewMode);
-  if (isBoss) setTimeout(() => SoundEngine.playFatalWarning(), 300);
+  if (isBoss && !state.reviewMode) {
+    showBossPanel();
+    setTimeout(() => SoundEngine.playFatalWarning(), 300);
+  } else {
+    hideBossPanel();
+  }
   if (el.questionBadge) {
     const perRun = state.shuffledIndices.length;
     el.questionBadge.textContent = `問 ${state.current + 1} / ${perRun}`;
@@ -858,6 +952,7 @@ function answerQuestion(selected) {
   updateStats(q.theme, correct);
   state.stageTotal += 1;
   state.sessionTotal += 1;
+  const wasBoss = isBossQuestion();
   if (correct) {
     state.sessionCorrect += 1;
     state.combo += 1;
@@ -877,11 +972,13 @@ function answerQuestion(selected) {
       state.lv += 1;
       msg += `⬆️ 段階が上がりました（段階 ${state.lv}）\n`;
     }
+    if (wasBoss) animateBossDefeat();
   } else {
     state.combo = 0;
     saveWrongAnswer(q.id);
-    if (isBossQuestion()) {
+    if (wasBoss) {
       state.hp = 0;
+      animateBossAttack();
       msg += `最終問題で誤答のため、このステージは終了し、コンディションは0になりました。\n`;
     } else {
         const damage = 20;
@@ -937,6 +1034,7 @@ function handleAfterAnswer(msg, correct) {
     if (state.stageIndex < getCurrentStages().length - 1) {
       const clearedIdx   = state.stageIndex;
       const clearedStage = getCurrentStages()[clearedIdx];
+      const oldRole      = clearedStage.role;
       const nextRole     = getCurrentStages()[state.stageIndex + 1].role;
       updateProgress(clearedIdx);
       SoundEngine.playStageClear();
@@ -946,7 +1044,7 @@ function handleAfterAnswer(msg, correct) {
         expGained: state.exp - state.stageExpBefore,
         maxCombo: state.stageMaxCombo,
       };
-      showStageClearOverlay(clearedIdx + 1, nextRole, grade.label, false, clearStats);
+      showStageClearOverlay(clearedIdx + 1, oldRole, nextRole, grade.label, false, clearStats);
       if (clearedStage.story?.clearStory) msg += `\n\n${clearedStage.story.clearStory}`;
       msg += `\n\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
@@ -987,7 +1085,8 @@ function handleAfterAnswer(msg, correct) {
         expGained: state.exp - state.stageExpBefore,
         maxCombo: state.stageMaxCombo,
       };
-      showStageClearOverlay(getCurrentStages().length, CLEARED_ROLE, grade.label, true, finalClearStats);
+      const finalOldRole = getCurrentStages()[state.stageIndex].role;
+      showStageClearOverlay(getCurrentStages().length, finalOldRole, CLEARED_ROLE, grade.label, true, finalClearStats);
       msg += `\n\n——全ステージを修了し、最終役職としてCLOを想定した評価ラインに到達しました。\n継続的な学習と、実務での検証をおすすめします。`;
       msg += `\n評価: ${grade.label}（${grade.reason}）`;
       msg += `\n正答率: ${state.stageCorrect}/${state.stageTotal}問`;
@@ -1115,12 +1214,33 @@ async function postResultToGas(payload) {
 }
 
 // ── ステージクリア演出 ─────────────────────────────
-function showStageClearOverlay(stageNum, newRole, grade, isFinal, stats = null) {
+function playEvolutionAnimation(oldRole, newRole) {
+  if (!el.evolutionStage || !oldRole || !newRole || oldRole === newRole) {
+    if (el.evolutionStage) el.evolutionStage.classList.add("hidden");
+    return;
+  }
+  const fromData = ROLE_AVATARS[oldRole] || { icon: "👤" };
+  const toData   = ROLE_AVATARS[newRole] || { icon: "👤" };
+  el.evolutionFromIcon.textContent = fromData.icon;
+  el.evolutionFromName.textContent = oldRole;
+  el.evolutionToIcon.textContent   = toData.icon;
+  el.evolutionToName.textContent   = newRole;
+  el.evolutionStage.classList.remove("hidden", "flashing");
+  void el.evolutionStage.offsetHeight;
+  el.evolutionStage.classList.add("flashing");
+}
+
+function showStageClearOverlay(stageNum, oldRole, newRole, grade, isFinal, stats = null) {
   const gradeColors = { S: "#fef08a", A: "#bfdbfe", B: "#bbf7d0", C: "#d1d5db" };
   el.stageClearNum.textContent   = isFinal ? "全ステージ修了" : `Stage ${stageNum} 修了`;
   el.stageClearRole.textContent  = isFinal ? `最終役職ライン: ${newRole}` : `次の役職ステージ: ${newRole}`;
   el.stageClearGrade.textContent = `評価 ${grade}`;
   el.stageClearGrade.style.color = gradeColors[grade] || "#e2e8f0";
+  if (isFinal) {
+    if (el.evolutionStage) el.evolutionStage.classList.add("hidden");
+  } else {
+    playEvolutionAnimation(oldRole, newRole);
+  }
   const statsEl = document.getElementById("stageClearStats");
   if (statsEl && stats) {
     const acc = stats.total > 0 ? Math.round(stats.correct / stats.total * 100) : 0;
