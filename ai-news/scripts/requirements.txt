@@ -1,0 +1,2 @@
+# Python 3.11+ stdlib only. このファイルはGH Actionsのpip stepで参照されますが
+# 依存パッケージはありません。

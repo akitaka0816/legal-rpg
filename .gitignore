@@ -1,2 +1,3 @@
 # Claude Code — 端末ごとの許可設定（リポジトリに含めない）
 .claude/settings.local.json
+__pycache__/
