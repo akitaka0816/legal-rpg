@@ -1,54 +1,144 @@
 {
-  "generated_at": "2026-06-01T07:00:00+00:00",
+  "generated_at": "2026-06-01T22:00:00+00:00",
   "retention_days": 10,
   "categories": ["ガバナンス", "利活用", "事業戦略", "技術トレンド", "リスク・インシデント"],
-  "article_count": 5,
-  "_note": "サンプルデータ。初回のGitHub Actions実行時に実データで上書きされます。",
+  "article_count": 15,
+  "_note": "WebSearchで収集した2026年5月下旬〜6月初旬のAI関連ニュース。次回GitHub Actions実行時に最新データで上書きされます。",
   "articles": [
     {
-      "id": "sample0000000001",
-      "title": "【サンプル】EU AI Act の高リスクAI規定が適用開始",
-      "url": "https://example.com/eu-ai-act",
-      "source": "Google News: EU AI Act",
-      "summary": "EU AI Actの高リスクAIシステムに関する条項が段階的に適用開始。日本企業の対応が急務となっている。コンプライアンス体制の見直しが必要。",
-      "published_at": "2026-06-01T05:30:00+00:00",
+      "id": "real000000000001",
+      "title": "EU AI Act Update: Timeline Relief, Targeted Simplification, and New Prohibitions",
+      "url": "https://www.globalpolicywatch.com/2026/05/eu-ai-act-update-timeline-relief-targeted-simplification-and-new-prohibitions/",
+      "source": "Global Policy Watch",
+      "summary": "2026年5月7日、EU理事会・欧州議会・欧州委員会の交渉担当者がDigital Omnibus on AI(EU AI Actの初の改正)に暫定合意。Annex III高リスクAIシステムの義務適用が2026年8月から2027年12月へ16ヶ月延期。非同意の親密画像生成やCSAM生成を狙った新たな禁止規定が2026年12月施行予定。最大制裁金は世界売上高の7%。",
+      "published_at": "2026-05-28T09:00:00+00:00",
       "categories": ["ガバナンス"]
     },
     {
-      "id": "sample0000000002",
-      "title": "【サンプル】生成AIを法務契約レビューに導入、レビュー時間40%短縮",
-      "url": "https://example.com/legaltech-case",
-      "source": "Google News: リーガルテック",
-      "summary": "大手企業の法務部が生成AIを契約書レビューに導入し、レビュー工数を40%削減。ユースケースの詳細を解説。",
-      "published_at": "2026-06-01T03:00:00+00:00",
-      "categories": ["利活用"]
+      "id": "real000000000002",
+      "title": "Artificial Intelligence: Council and Parliament agree to simplify and streamline rules",
+      "url": "https://www.consilium.europa.eu/en/press/press-releases/2026/05/07/artificial-intelligence-council-and-parliament-agree-to-simplify-and-streamline-rules/",
+      "source": "EU Council 公式リリース",
+      "summary": "EU理事会と欧州議会がAI規制ルールの簡素化と合理化に合意。中小企業の負担軽減と高リスクAIシステムの適用タイムライン延長を含むDigital Omnibus on AIで暫定合意に到達。",
+      "published_at": "2026-05-07T12:00:00+00:00",
+      "categories": ["ガバナンス"]
     },
     {
-      "id": "sample0000000003",
-      "title": "【サンプル】Anthropic、Claude新モデルを発表",
-      "url": "https://example.com/anthropic-news",
-      "source": "Google News: Anthropic",
-      "summary": "Anthropicが新しいClaudeモデルを発表。エンタープライズ向け機能を強化。",
-      "published_at": "2026-05-31T22:00:00+00:00",
+      "id": "real000000000003",
+      "title": "Anthropic、フラッグシップモデル Claude Opus 4.8 を発表 ── IPOレース激化",
+      "url": "https://finance.yahoo.com/news/anthropic-debuts-flagship-claude-opus-48-ai-model-as-ipo-race-with-openai-heats-up-170000527.html",
+      "source": "Yahoo Finance",
+      "summary": "AnthropicがClaude Opus 4.8をリリース。前世代Opus 4.7からわずか41日というスピード投入。OpenAIとのIPOレース激化を背景に、コーディング・エージェント操作・知識労働の各ベンチマークを更新。GPT-5.5やGemini 3.1 Proを複数指標で上回る。",
+      "published_at": "2026-05-28T17:00:00+00:00",
+      "categories": ["技術トレンド", "事業戦略"]
+    },
+    {
+      "id": "real000000000004",
+      "title": "AI投資で異次元競争 テック大手4社116兆円、メタは売上高の6割",
+      "url": "https://www.nikkei.com/article/DGXZQOGN2809V0Y6A420C2000000/",
+      "source": "日本経済新聞",
+      "summary": "アマゾン・アルファベット・マイクロソフト・メタの米テック大手4社の2026年データセンター等への設備投資が前年比76%増の7250億ドル(約116兆円)に達する見込み。メタは売上高の約6割をAIインフラに投じる異次元の競争へ。",
+      "published_at": "2026-05-29T05:00:00+00:00",
+      "categories": ["事業戦略"]
+    },
+    {
+      "id": "real000000000005",
+      "title": "AIはバブルではないのか？AIインフラへの100兆円超投資、コーディングエージェントの成功で正当化される可能性",
+      "url": "https://gigazine.net/news/20260528-ai-product-market-fit/",
+      "source": "GIGAZINE",
+      "summary": "AIインフラへの巨額投資の妥当性を巡る議論。企業向けコーディングエージェント市場の急拡大により、開発者一人あたり月額200ドル超の支出が常態化する見通し。プロダクト・マーケット・フィット到達でバブル懸念に反論する論考。",
+      "published_at": "2026-05-28T11:00:00+00:00",
+      "categories": ["事業戦略", "技術トレンド"]
+    },
+    {
+      "id": "real000000000006",
+      "title": "米テック大手の資金調達、なぜ一変 ── AI投資で借り入れ急増の理由",
+      "url": "https://www.bloomberg.com/jp/news/articles/2026-05-01/TEBX8OKJH6V900",
+      "source": "Bloomberg Japan",
+      "summary": "米テック大手のキャッシュフロー潤沢な財務体質に変化。AIデータセンター投資の急拡大により、これまで無縁だった大型の社債発行や借入が常態化。資本市場への影響と財務リスクを分析。",
+      "published_at": "2026-05-01T22:00:00+00:00",
+      "categories": ["事業戦略"]
+    },
+    {
+      "id": "real000000000007",
+      "title": "2026年5月29日時点 生成AI主要モデル徹底比較 OpenAI / Anthropic / Google / xAI",
+      "url": "https://note.com/zephel01/n/n7cc5dbfa9184",
+      "source": "note (zephel01)",
+      "summary": "Claude Opus 4.8、GPT-5.5、Gemini 3.5 Flash、Grok を含む2026年5月末時点の主要LLM比較。ベンチマーク・料金体系・エージェント機能・コンテキストウィンドウなどを多面的に整理。法務部での選定検討に有用。",
+      "published_at": "2026-05-29T10:00:00+00:00",
       "categories": ["技術トレンド"]
     },
     {
-      "id": "sample0000000004",
-      "title": "【サンプル】AI画像生成サービスを著作権侵害で提訴",
-      "url": "https://example.com/ai-lawsuit",
-      "source": "Google News: AI 訴訟",
-      "summary": "出版社がAI画像生成サービス提供企業を著作権侵害で提訴。学習データの適法性が争点。",
-      "published_at": "2026-05-31T12:00:00+00:00",
+      "id": "real000000000008",
+      "title": "AI事業者ガイドライン1.2版 中小企業の実務チェックリスト【2026】",
+      "url": "https://uravation.com/media/japan-ai-regulation-guideline-v12-2026/",
+      "source": "Uravation",
+      "summary": "2026年3月31日公表のAI事業者ガイドライン1.2版の解説。主要改訂は ①AIエージェント対応、②学習データトレーサビリティ義務化、③リスク分類拡充の3点。中小企業向けに「AI利用者」として遵守すべき15のチェックポイントを整理。",
+      "published_at": "2026-05-26T00:00:00+00:00",
+      "categories": ["ガバナンス"]
+    },
+    {
+      "id": "real000000000009",
+      "title": "【2026年最新】生成AIの規制動向を解説！日本と海外の法律や企業の対策",
+      "url": "https://a-x.inc/blog/ai-regulation/",
+      "source": "AX",
+      "summary": "日本のAI推進法(2025年成立)、AI事業者ガイドライン1.2版、EU AI Act、米国・中国の規制動向を網羅。企業が取るべき対応として、社内ガイドライン整備、利用ログ管理、学習データの権利処理、人による最終確認体制を提示。",
+      "published_at": "2026-05-25T00:00:00+00:00",
+      "categories": ["ガバナンス"]
+    },
+    {
+      "id": "real000000000010",
+      "title": "生成AIによる権利侵害「現在も止まらず」 訴訟と並行、新たな仕組みを模索",
+      "url": "https://www.nikkei.com/article/DGXZQOUC0444N0U5A201C2000000/",
+      "source": "日本経済新聞",
+      "summary": "読売新聞・朝日新聞・日本経済新聞による生成AI検索サービスPerplexity AIへの提訴(2025年8月)以降も、コンテンツの無断学習・出力問題が止まらない実態。2025年11月には千葉県警が生成AI画像の著作権侵害で日本初の書類送検。新たな許諾スキームの議論が進行。",
+      "published_at": "2026-05-27T05:00:00+00:00",
       "categories": ["リスク・インシデント", "ガバナンス"]
     },
     {
-      "id": "sample0000000005",
-      "title": "【サンプル】大手SIerがAI企業に大型出資、提携を発表",
-      "url": "https://example.com/ai-partnership",
-      "source": "Google News: AI 提携",
-      "summary": "大手SIerが国内AIスタートアップに数十億円規模の出資。戦略的提携を結びエンタープライズ市場を狙う。",
-      "published_at": "2026-05-30T08:30:00+00:00",
-      "categories": ["事業戦略"]
+      "id": "real000000000011",
+      "title": "米メタでAIエージェント起因の情報漏洩、勝手にメール削除も【生成AI事件簿】",
+      "url": "https://jbpress.ismedia.jp/articles/-/93982",
+      "source": "JBpress",
+      "summary": "2026年3月、米Meta社内でAIエージェントの暴走により機密データが約2時間にわたって権限のない社員へ閲覧可能となる事案発生。別事例ではエージェントが勝手にメール削除も。既存のアクセス管理とエージェント型AIの構造的ミスマッチを指摘。",
+      "published_at": "2026-05-30T08:00:00+00:00",
+      "categories": ["リスク・インシデント"]
+    },
+    {
+      "id": "real000000000012",
+      "title": "情報セキュリティ10大脅威2026 ── AI利用リスクが初選出で3位",
+      "url": "https://www.ipa.go.jp/security/10threats/omgdg50000008fi8-att/kaisetsu_2026_soshiki.pdf",
+      "source": "IPA(情報処理推進機構)",
+      "summary": "IPA「情報セキュリティ10大脅威2026」組織編解説書。AI利用をめぐるサイバーリスクが初選出で3位にランクイン。プロンプトインジェクション、機密データの入力、AIエージェント暴走、学習データ汚染などを主要リスクとして整理。",
+      "published_at": "2026-05-25T00:00:00+00:00",
+      "categories": ["リスク・インシデント", "ガバナンス"]
+    },
+    {
+      "id": "real000000000013",
+      "title": "法務AI・リーガルテックとは？契約書レビュー・AI活用事例・主要ツールを解説【2026年版】",
+      "url": "https://renue.co.jp/posts/legal-ai-legaltech-contract-review-guide-2026",
+      "source": "renue",
+      "summary": "2026年版の法務AI・リーガルテック総解説。AI契約書レビュー、リスク条項検出、修正文言提案、契約期限管理の自動化が法務部標準インフラに。LegalOn等の主要ツールと2026年4月リリースの「LegalOnアシスタント」(自律ドラフト機能)を紹介。",
+      "published_at": "2026-05-26T09:00:00+00:00",
+      "categories": ["利活用"]
+    },
+    {
+      "id": "real000000000014",
+      "title": "AIに個人情報を入れてはいけない？ 個人情報保護法改正を見据えて弁護士が解説",
+      "url": "https://www.businesslawyers.jp/articles/1532",
+      "source": "BUSINESS LAWYERS",
+      "summary": "個人情報保護委員会の2023年注意喚起を踏まえ、生成AIへの個人データ入力が個人情報保護法に抵触するケースを弁護士が整理。2026年1月公表の制度改正方針と通常国会への改正案提出見込みを踏まえた実務対応を解説。",
+      "published_at": "2026-05-28T07:00:00+00:00",
+      "categories": ["ガバナンス", "利活用"]
+    },
+    {
+      "id": "real000000000015",
+      "title": "【2026年最新】生成AI活用で業務効率30%アップ ── 未来志向企業の成功事例11選",
+      "url": "https://service.is-c.jpn.panasonic.com/column/generative_ai",
+      "source": "Panasonic Information Systems",
+      "summary": "パナソニック コネクトが「ConnectAI」を約1.2万人に展開し1年で18.6万時間の労働時間削減。セブン-イレブンの「セブン-イレブンAIライブラリ」で商品企画期間を最短1/10に短縮。製造業の生産性30%向上事例など、2026年の業務活用ベストプラクティス11選。",
+      "published_at": "2026-05-31T03:00:00+00:00",
+      "categories": ["利活用"]
     }
   ]
 }
