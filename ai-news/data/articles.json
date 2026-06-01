@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-06-01T07:00:00+00:00",
+  "retention_days": 10,
+  "categories": ["ガバナンス", "利活用", "事業戦略", "技術トレンド", "リスク・インシデント"],
+  "article_count": 5,
+  "_note": "サンプルデータ。初回のGitHub Actions実行時に実データで上書きされます。",
+  "articles": [
+    {
+      "id": "sample0000000001",
+      "title": "【サンプル】EU AI Act の高リスクAI規定が適用開始",
+      "url": "https://example.com/eu-ai-act",
+      "source": "Google News: EU AI Act",
+      "summary": "EU AI Actの高リスクAIシステムに関する条項が段階的に適用開始。日本企業の対応が急務となっている。コンプライアンス体制の見直しが必要。",
+      "published_at": "2026-06-01T05:30:00+00:00",
+      "categories": ["ガバナンス"]
+    },
+    {
+      "id": "sample0000000002",
+      "title": "【サンプル】生成AIを法務契約レビューに導入、レビュー時間40%短縮",
+      "url": "https://example.com/legaltech-case",
+      "source": "Google News: リーガルテック",
+      "summary": "大手企業の法務部が生成AIを契約書レビューに導入し、レビュー工数を40%削減。ユースケースの詳細を解説。",
+      "published_at": "2026-06-01T03:00:00+00:00",
+      "categories": ["利活用"]
+    },
+    {
+      "id": "sample0000000003",
+      "title": "【サンプル】Anthropic、Claude新モデルを発表",
+      "url": "https://example.com/anthropic-news",
+      "source": "Google News: Anthropic",
+      "summary": "Anthropicが新しいClaudeモデルを発表。エンタープライズ向け機能を強化。",
+      "published_at": "2026-05-31T22:00:00+00:00",
+      "categories": ["技術トレンド"]
+    },
+    {
+      "id": "sample0000000004",
+      "title": "【サンプル】AI画像生成サービスを著作権侵害で提訴",
+      "url": "https://example.com/ai-lawsuit",
+      "source": "Google News: AI 訴訟",
+      "summary": "出版社がAI画像生成サービス提供企業を著作権侵害で提訴。学習データの適法性が争点。",
+      "published_at": "2026-05-31T12:00:00+00:00",
+      "categories": ["リスク・インシデント", "ガバナンス"]
+    },
+    {
+      "id": "sample0000000005",
+      "title": "【サンプル】大手SIerがAI企業に大型出資、提携を発表",
+      "url": "https://example.com/ai-partnership",
+      "source": "Google News: AI 提携",
+      "summary": "大手SIerが国内AIスタートアップに数十億円規模の出資。戦略的提携を結びエンタープライズ市場を狙う。",
+      "published_at": "2026-05-30T08:30:00+00:00",
+      "categories": ["事業戦略"]
+    }
+  ]
+}

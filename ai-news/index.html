@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>法務部 AIニュース ダッシュボード</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <h1>法務部 AIニュース ダッシュボード</h1>
+    <div class="meta">
+      <span id="generated-at">取得時刻: --</span>
+      <span id="article-count">記事数: --</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <aside class="sidebar">
+    <section class="filter-block">
+      <h2>カテゴリ</h2>
+      <div id="category-filters" class="chip-group"></div>
+    </section>
+
+    <section class="filter-block">
+      <h2>期間</h2>
+      <div id="date-filters" class="chip-group">
+        <button class="chip" data-range="today">今日</button>
+        <button class="chip active" data-range="3d">3日以内</button>
+        <button class="chip" data-range="7d">7日以内</button>
+        <button class="chip" data-range="all">全期間</button>
+      </div>
+    </section>
+
+    <section class="filter-block">
+      <h2>表示</h2>
+      <label class="toggle">
+        <input type="checkbox" id="hide-read" />
+        既読を非表示
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="only-starred" />
+        ★お気に入りのみ
+      </label>
+    </section>
+
+    <section class="filter-block">
+      <h2>検索</h2>
+      <input type="search" id="search-input" placeholder="キーワード..." />
+    </section>
+
+    <section class="filter-block">
+      <h2>ソース</h2>
+      <div id="source-filters" class="chip-group scroll"></div>
+    </section>
+  </aside>
+
+  <section class="content">
+    <div id="article-list"></div>
+    <div id="empty-state" class="empty-state" hidden>該当する記事はありません</div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
