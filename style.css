@@ -509,6 +509,349 @@ button:hover {
   to   { transform: scale(1);   opacity: 1; }
 }
 
+/* ── ボス戦演出 ──────────────────────────────────── */
+.boss-battle {
+  position: relative;
+  margin: 14px 0 16px;
+  padding: 16px 18px 14px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 30% 30%, #1f2937 0%, #0f172a 100%);
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.35), inset 0 0 18px rgba(239, 68, 68, 0.18);
+  overflow: hidden;
+  animation: bossEnter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.boss-battle.hidden { display: none; }
+
+.boss-battle::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(239,68,68,0.06) 0 8px, transparent 8px 16px);
+  pointer-events: none;
+}
+
+.boss-battle-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 1;
+}
+
+.boss-avatar {
+  flex: 0 0 auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff5f5 0%, #fee2e2 60%, #fecaca 100%);
+  border: 3px solid #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+  animation: bossFloat 2.4s ease-in-out infinite alternate;
+}
+
+.boss-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.boss-info { flex: 1; min-width: 0; }
+
+.boss-name {
+  color: #fef2f2;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+  margin-bottom: 6px;
+}
+
+.boss-hp-bar-bg {
+  width: 100%;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.boss-hp-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 50%, #fca5a5 100%);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.boss-hp-text {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: #fecaca;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.battle-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.battle-effect.slash::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -20%;
+  width: 140%;
+  height: 6px;
+  background: linear-gradient(90deg, transparent 0%, #fff 40%, #fef08a 50%, #fff 60%, transparent 100%);
+  filter: drop-shadow(0 0 10px #fde047);
+  transform: translateY(-50%) rotate(-12deg);
+  animation: slashSweep 0.45s ease-out forwards;
+}
+
+.battle-effect.flash {
+  background: rgba(255, 255, 255, 0.7);
+  animation: battleFlash 0.32s ease-out forwards;
+}
+
+.battle-effect.boss-hit {
+  background: radial-gradient(circle at center, rgba(239,68,68,0.55) 0%, transparent 65%);
+  animation: battleFlash 0.45s ease-out forwards;
+}
+
+.boss-shake { animation: bossShake 0.45s ease-in-out !important; }
+
+.boss-defeated .boss-avatar {
+  filter: grayscale(0.6) brightness(0.55);
+  animation: bossDefeat 0.9s ease-out forwards !important;
+}
+
+.battle-result-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  z-index: 3;
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  padding: 8px 22px;
+  border-radius: 10px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.battle-result-badge.hidden { display: none; }
+
+.battle-result-badge.victory {
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  border: 2px solid #fde047;
+  box-shadow: 0 0 24px rgba(253, 224, 71, 0.7);
+  animation: badgePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.battle-result-badge.defeat {
+  background: linear-gradient(135deg, #475569, #1e293b);
+  border: 2px solid #94a3b8;
+  animation: badgePop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+#quizSection.player-hit {
+  animation: screenShake 0.42s ease-in-out;
+}
+
+#quizSection.player-hit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(239,68,68,0.18) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: inherit;
+  animation: battleFlash 0.42s ease-out forwards;
+}
+
+#quizSection { position: relative; }
+
+@keyframes bossEnter {
+  from { transform: translateY(-12px) scale(0.92); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes bossFloat {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-4px); }
+}
+
+@keyframes bossShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px) rotate(-2deg); }
+  40% { transform: translateX(8px) rotate(2deg); }
+  60% { transform: translateX(-6px) rotate(-1deg); }
+  80% { transform: translateX(6px) rotate(1deg); }
+}
+
+@keyframes bossDefeat {
+  0%   { transform: scale(1) rotate(0); opacity: 1; }
+  60%  { transform: scale(1.1) rotate(-15deg); opacity: 0.9; }
+  100% { transform: scale(0.6) rotate(-45deg) translateY(20px); opacity: 0.35; }
+}
+
+@keyframes slashSweep {
+  0%   { transform: translateY(-50%) rotate(-12deg) translateX(-100%); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-50%) rotate(-12deg) translateX(100%); opacity: 0; }
+}
+
+@keyframes battleFlash {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes screenShake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-7px); }
+  30% { transform: translateX(7px); }
+  45% { transform: translateX(-5px); }
+  60% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+@keyframes badgePop {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+  60%  { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* ── 進化（昇格）演出 ────────────────────────────── */
+.evolution-stage {
+  position: relative;
+  margin: 8px 0 16px;
+  padding: 18px 12px 12px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1.5px solid #fcd34d;
+  overflow: hidden;
+}
+
+.evolution-stage.hidden { display: none; }
+
+.evolution-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  z-index: 1;
+}
+
+.evolution-slot {
+  text-align: center;
+  min-width: 88px;
+}
+
+.evolution-slot-icon {
+  display: inline-block;
+  font-size: 2.6rem;
+  line-height: 1;
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #fcd34d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+.evolution-slot-name {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.evolution-from .evolution-slot-icon {
+  filter: grayscale(0.25);
+  opacity: 0.85;
+  animation: evolutionFromShake 1.6s ease-in-out;
+}
+
+.evolution-to .evolution-slot-icon {
+  border-color: #f59e0b;
+  background: radial-gradient(circle, #fef9c3 0%, #fff 60%);
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+  animation: evolutionToReveal 1.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.evolution-arrow {
+  font-size: 1.6rem;
+  color: #f59e0b;
+  font-weight: 900;
+  animation: evolutionArrowPulse 1.4s ease-in-out infinite;
+}
+
+.evolution-label {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.4em;
+  color: #b45309;
+  text-align: center;
+}
+
+.evolution-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.95) 0%, rgba(253, 224, 71, 0.4) 30%, transparent 70%);
+  opacity: 0;
+  z-index: 2;
+}
+
+.evolution-stage.flashing .evolution-flash {
+  animation: evolutionFlash 1.1s ease-out;
+}
+
+@keyframes evolutionFromShake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-3px) rotate(-3deg); }
+  20% { transform: translateX(3px) rotate(3deg); }
+  30% { transform: translateX(-2px) rotate(-2deg); }
+  40% { transform: translateX(2px) rotate(2deg); }
+  50% { transform: translateX(0) scale(1.05); }
+  70% { transform: scale(0.92); opacity: 0.7; }
+  100% { opacity: 0.85; }
+}
+
+@keyframes evolutionToReveal {
+  0%   { transform: scale(0.3) rotate(-180deg); opacity: 0; }
+  60%  { transform: scale(1.2) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes evolutionArrowPulse {
+  0%, 100% { transform: translateX(0); opacity: 0.6; }
+  50% { transform: translateX(6px); opacity: 1; }
+}
+
+@keyframes evolutionFlash {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* ── スコアバナー ─────────────────────────────────── */
 .score-banner {
   text-align: center;
