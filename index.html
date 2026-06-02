@@ -119,6 +119,22 @@
             <div id="fatalWarning" class="fatal-warning hidden">
               最終問題 — 不正解または時間切れの場合、このステージは終了し、セッションはここまでとなります。
             </div>
+            <div id="bossBattle" class="boss-battle hidden">
+              <div class="boss-battle-stage">
+                <div id="bossAvatar" class="boss-avatar">
+                  <span id="bossIcon" class="boss-icon">📜</span>
+                </div>
+                <div class="boss-info">
+                  <div id="bossName" class="boss-name">最終問題</div>
+                  <div class="boss-hp-bar-bg">
+                    <div id="bossHpBar" class="boss-hp-bar"></div>
+                  </div>
+                  <div id="bossHpText" class="boss-hp-text">HP 100 / 100</div>
+                </div>
+              </div>
+              <div id="battleEffect" class="battle-effect"></div>
+              <div id="battleResultBadge" class="battle-result-badge hidden"></div>
+            </div>
             <p id="questionText"></p>
             <div id="choices"></div>
           </section>
@@ -146,6 +162,21 @@
       <div class="stage-clear-box">
         <div class="stage-clear-title">ステージ修了</div>
         <div id="stageClearNum" class="stage-clear-num"></div>
+        <div id="evolutionStage" class="evolution-stage hidden">
+          <div class="evolution-track">
+            <div class="evolution-slot evolution-from">
+              <span id="evolutionFromIcon" class="evolution-slot-icon"></span>
+              <div id="evolutionFromName" class="evolution-slot-name"></div>
+            </div>
+            <div class="evolution-arrow">▶</div>
+            <div class="evolution-slot evolution-to">
+              <span id="evolutionToIcon" class="evolution-slot-icon"></span>
+              <div id="evolutionToName" class="evolution-slot-name"></div>
+            </div>
+          </div>
+          <div class="evolution-label">役職昇格</div>
+          <div class="evolution-flash"></div>
+        </div>
         <div id="stageClearRole" class="stage-clear-role"></div>
         <div id="stageClearGrade" class="stage-clear-grade-badge"></div>
         <div id="stageClearStats" class="stage-clear-stats hidden"></div>
