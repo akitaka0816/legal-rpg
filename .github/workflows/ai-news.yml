@@ -1,9 +1,10 @@
 name: AI News Fetch
 
 on:
-  schedule:
-    # 平日(月〜金) JST 7:00 = UTC 22:00 前日
-    - cron: "0 22 * * 0-4"
+  # cron による自動実行は無効化(運用はClaude Codeの /daily-news で手動更新)
+  # 自動運用に切り替えたい場合は下記コメントを外す:
+  # schedule:
+  #   - cron: "0 22 * * 0-4"  # 平日(月〜金) JST 7:00 = UTC 22:00 前日
   workflow_dispatch:
 
 permissions:
